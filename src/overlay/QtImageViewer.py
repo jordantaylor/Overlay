@@ -42,7 +42,7 @@ class QtImageViewer(QGraphicsView):
     rightMouseButtonDoubleClicked = pyqtSignal(float, float)
 
     # Want this to emit amount scrolled in/out (negative for out, positive for in)
-    scrollWheelDown = pyqtSignal(float)
+    scrollwheelScrolled = pyqtSignal(float)
 
     def __init__(self):
         QGraphicsView.__init__(self)
@@ -171,9 +171,12 @@ class QtImageViewer(QGraphicsView):
         """
         QGraphicsView.mouseReleaseEvent(self, event)
         scenePos = self.mapToScene(event.pos())
+        # release of leftbutton implies the mouse was dragged, so the user wants panning motion
         if event.button() == Qt.LeftButton:
             self.setDragMode(QGraphicsView.NoDrag)
             self.leftMouseButtonReleased.emit(scenePos.x(), scenePos.y())
+        # release of rightbutton means they've let go after selecting a zoom box (or just clicking for no reason)
+        # so zoom the image if possible
         elif event.button() == Qt.RightButton:
             if self.canZoom:
                 viewBBox = self.zoomStack[-1] if len(self.zoomStack) else self.sceneRect()
@@ -207,6 +210,7 @@ class QtImageViewer(QGraphicsView):
                 self._zoom -= 1
             if self._zoom > 0:
                 self.scale(factor, factor)
+            self.scrollwheelScrolled.emit(self._zoom)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QRect
+from PyQt5.QtCore import QRect, pyqtSlot, pyqtSignal
 
 from StackWidget import StackWidget
 
@@ -14,18 +14,32 @@ class Overlay(QMainWindow):
 		
 	def initUI(self):
 		self.setGeometry(135, 200, 800, 600)
-		self.setWindowTitle('USNG Overlay - Main')
+		self.setWindowTitle('USNG Overlay - Start')
 		self.setWindowIcon(QIcon('..\\..\\assets\\gimp_pepper.png')) 
 
 		self.createMenuBar()
 
-		wid = StackWidget()
-		self.setCentralWidget(wid)
-		layout = QVBoxLayout()
-		wid.setLayout(layout)
+		self.wid = StackWidget()
+		self.setCentralWidget(self.wid)
+
+		# Button signals
+		self.wid.page1.changeWidgetSignal.connect(self.switchWidget)
+		self.wid.page2.changeWidgetSignal.connect(self.switchWidget)
+		self.wid.page3.changeWidgetSignal.connect(self.switchWidget)
+		self.wid.page1.selectTifSignal.connect(self.wid.page2.on_load_signal)
 
 		self.center()
 		self.show()
+
+	@pyqtSlot(int)
+	def switchWidget(self,widgetID):
+		if widgetID == 0:
+			self.setWindowTitle("USNG Overlay - Start")
+		elif widgetID == 1:
+			self.setWindowTitle("USNG Overlay - Main")
+		else:
+			self.setWindowTitle("USNG Overlay - Load Saved Waypoints")
+		self.wid.setCurrentIndex(widgetID)
 
 	def createMenuBar(self):
 		# Create a file menu for opening new file, exporting to image, & other file ops
@@ -34,9 +48,9 @@ class Overlay(QMainWindow):
 		viewMenu = menubar.addMenu('View')
 		
 		# Create the file actions and add them
-		openAct = QAction('Open TIFF Image', self)
-		exportPngAct = QAction('Export Overlay to PNG', self)
-		saveWayptsAct = QAction('Save Waypoints to File', self)
+		openAct = QAction('Open TIFF Image [TODO]', self)
+		exportPngAct = QAction('Export Overlay to PNG [TODO]', self)
+		saveWayptsAct = QAction('Save Waypoints to File [TODO]', self)
 		exitAct = QAction('Exit Program', self)
 		fileMenu.addAction(openAct)
 		fileMenu.addAction(exportPngAct)
@@ -44,11 +58,7 @@ class Overlay(QMainWindow):
 		fileMenu.addAction(exitAct)
 
 		# Create a view menu for show/hide waypoint list popup, & other view ops
-		zoomInAct = QAction('Zoom in', self)
-		zoomOutAct = QAction('Zoom out', self)
-		toggleWayptsAct = QAction('Toggle Waypoint List', self)
-		viewMenu.addAction(zoomInAct)
-		viewMenu.addAction(zoomOutAct)
+		toggleWayptsAct = QAction('Toggle Waypoint List [TODO]', self)
 		viewMenu.addAction(toggleWayptsAct)
 
 	def center(self):

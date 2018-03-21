@@ -24,3 +24,5 @@ class StackWidget(QWidget):
 		vbox.addWidget(self.stackWidget)
 
 		self.setLayout(vbox)
+	def setCurrentIndex( self, pagenum ):
+		self.stackWidget.setCurrentIndex(pagenum)
