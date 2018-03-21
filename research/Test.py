@@ -6,6 +6,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from QtImageViewer import QtImageViewer
+from getpoints import getpoints
+from test2 import PhotoViewer
 
 
 # Custom slot for handling mouse clicks in our viewer.
@@ -55,6 +57,9 @@ if __name__ == '__main__':
     
     # Display the image in the viewer.
     viewer.setImage(image)
+    points = getpoints(fileName)
+    for key in points.keys():
+        print(key, points[key])
     
     # Handle left mouse clicks with your own custom slot
     # handleLeftClick(x, y). (x, y) are image coordinates.
