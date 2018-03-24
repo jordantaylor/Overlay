@@ -11,7 +11,6 @@ class Overlay(QMainWindow):
 		
 		self.initUI()
 		
-		
 	def initUI(self):
 		self.setGeometry(135, 200, 800, 600)
 		self.setWindowTitle('USNG Overlay - Start')
@@ -49,10 +48,12 @@ class Overlay(QMainWindow):
 		
 		# Create the file actions and add them
 		openAct = QAction('Open TIFF Image [TODO]', self)
+		loadAct = QAction('Load Saved TIFF File [TODO]', self)
 		exportPngAct = QAction('Export Overlay to PNG [TODO]', self)
 		saveWayptsAct = QAction('Save Waypoints to File [TODO]', self)
 		exitAct = QAction('Exit Program', self)
 		fileMenu.addAction(openAct)
+		fileMenu.addAction(loadAct)
 		fileMenu.addAction(exportPngAct)
 		fileMenu.addAction(saveWayptsAct)
 		fileMenu.addAction(exitAct)
@@ -65,7 +66,7 @@ class Overlay(QMainWindow):
 		qr = self.frameGeometry()
 		cp = QDesktopWidget().availableGeometry().center()
 		qr.moveCenter(cp)
-		self.move(qr.topLeft())    
+		self.move(qr.topLeft())
 		
 if __name__ == '__main__':
 	
