@@ -33,6 +33,7 @@ class OverlayWidget(QWidget):
 		################################################################
 
 		# 'waypts' is the panel itself, it is a QWidget
+		self.waypts = QWidget()
 		self.waypts.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
 		# 'waypts_layout' allows us to add waypoints to 'waypts'
@@ -149,7 +150,7 @@ class OverlayWidget(QWidget):
 		self.viewer.delete_waypoint(_key)
 
 	# 'add_show_waypoint' adds the waypoint from 'waypts'
-	ef add_show_waypoint(self, _key):
+	def add_show_waypoint(self, _key):
 		index = ord(_key) - ord('A')
 		self.waypoint_widgets[index].show()
 		self.waypts_layout.addWidget(self.waypoint_widgets[index])
