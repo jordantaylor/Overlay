@@ -99,11 +99,13 @@ class QtImageViewer(QGraphicsView):
         self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
         if self.zoom_level < self.zoom_max:
         	self.scale(1.25, 1.25)
+        	self.zoom_level += 1
 
     def zoom_out_btn_press(self):
         self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
-        if self.zoom_level < self.zoom_min:
+        if self.zoom_level > self.zoom_min:
         	self.scale(0.8, 0.8)
+        	self.zoom_level -= 1
 
     def expand_btn_press(self):
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
@@ -131,11 +133,13 @@ class QtImageViewer(QGraphicsView):
 
     # 'add_waypoint' adds a waypoint to the image if there are remaining keys in the 'key_array'
     def add_waypoint(self, x, y):
-        if self.key_array: 
+        if self.key_array:
+            _key = self.key_array.pop()
+            _alpha_pin_path = '../../assets/pins/pin_' + _key + '.png'
+            self.waypoint_icon = QPixmap(os.path.join(self.cur_path, _alpha_pin_path))
             self.waypoint = QGraphicsPixmapItem(self.waypoint_icon)
             self.waypoint.setPos(x, y)
             self.scene.addItem(self.waypoint)
-            _key = self.key_array.pop()
             self.waypoints[_key] = self.waypoint
             self.add_delete_waypoint_signal.emit(1, _key)
 
