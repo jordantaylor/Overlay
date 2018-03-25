@@ -25,8 +25,6 @@ class OverlayWidget(QWidget):
 		super().__init__()
 		self.initUI()
 
-#### Init Functions ########################################################
-
 	def initUI(self):
 
 		################################################################
