@@ -3,6 +3,7 @@ import collections
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from GeoInfo import compute_gridlines, get_points
 
 class QtImageViewer(QGraphicsView):
     
@@ -88,6 +89,19 @@ class QtImageViewer(QGraphicsView):
         self.scene.addPixmap(self.pixmap)
         self.setScene(self.scene)
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+        self.create_grid()
+
+    def create_grid(self):
+        lines = compute_gridlines(get_points( self.image_path ))
+        pen = QPen()
+        pen.setWidth(2)
+        pen.setCosmetic(True)
+        pen.setBrush(Qt.red)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setJoinStyle(Qt.RoundJoin)
+        for line in lines: # line : [ [ x1, y1, x2, y2 ] ]
+            print(line[0], line[1], line[2], line[3])
+            self.scene.addLine( line[0], line[1], line[2], line[3], pen)
 
     def zoom_in_btn_press(self):
         self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
