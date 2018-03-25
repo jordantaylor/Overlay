@@ -1,5 +1,6 @@
 import os.path
 import collections
+import bisect
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -13,6 +14,11 @@ class QtImageViewer(QGraphicsView):
 
         # 'cur_path' is used to generate the paths for the .pngs
         self.cur_path = os.path.dirname(__file__)
+
+        # important for upholding zoom max and min
+        self.zoom_level = 0
+        self.zoom_max = 15
+        self.zoom_min = -3
 
         # 'key_array' holds the alphabetical ('A'-'Z') keys associated with the waypoints
         self.key_array = [] 
@@ -114,14 +120,19 @@ class QtImageViewer(QGraphicsView):
 
     def zoom_in_btn_press(self):
         self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
-        self.scale(1.25, 1.25)
+        if self.zoom_level < self.zoom_max:
+        	self.scale(1.25, 1.25)
+        	self.zoom_level += 1
 
     def zoom_out_btn_press(self):
         self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
-        self.scale(0.8, 0.8)
+        if self.zoom_level > self.zoom_min:
+        	self.scale(0.8, 0.8)
+        	self.zoom_level -= 1
 
     def expand_btn_press(self):
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+        self.zoom_level = 0
 
     def visibility_wpts_btn_press(self):
         if self.waypoints and self.waypoints[list(self.waypoints.keys())[0]].isVisible():
@@ -140,26 +151,32 @@ class QtImageViewer(QGraphicsView):
         if self.waypoints and _key not in self.key_array:
             self.scene.removeItem(self.waypoints[_key])
             self.key_array.append(_key)
+            self.key_array.sort(reverse=True)
             del self.waypoints[_key]
 
     # 'add_waypoint' adds a waypoint to the image if there are remaining keys in the 'key_array'
     def add_waypoint(self, x, y):
-        if self.key_array: 
+        if self.key_array:
+            _key = self.key_array.pop()
+            _alpha_pin_path = '../../assets/pins/pin_' + _key + '.png'
+            self.waypoint_icon = QPixmap(os.path.join(self.cur_path, _alpha_pin_path))
             self.waypoint = QGraphicsPixmapItem(self.waypoint_icon)
             self.waypoint.setPos(x, y)
             self.scene.addItem(self.waypoint)
-            _key = self.key_array.pop()
             self.waypoints[_key] = self.waypoint
             self.add_delete_waypoint_signal.emit(1, _key, x, y)
 
     # 'wheelEvent' is used for scroll zooming the image
     def wheelEvent(self, event):
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-        if event.angleDelta().y() > 0:
+        if event.angleDelta().y() > 0 and self.zoom_level < self.zoom_max:
             factor = 1.25
-        else:
+            self.zoom_level += 1
+            self.scale(factor, factor)
+        elif event.angleDelta().y() < 0 and self.zoom_level > self.zoom_min:
             factor = 0.8
-        self.scale(factor, factor)
+            self.zoom_level -= 1
+            self.scale(factor, factor)
 
     # 'mousePressEvent' is used for panning of the image and adding waypoints
     def mousePressEvent(self, event):
