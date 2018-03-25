@@ -4,10 +4,11 @@ import bisect
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from GeoInfo import *
 
 class QtImageViewer(QGraphicsView):
     
-    add_delete_waypoint_signal = pyqtSignal(int, str)
+    add_delete_waypoint_signal = pyqtSignal(int, str, int, int)
 
     def __init__(self):
 
@@ -94,6 +95,28 @@ class QtImageViewer(QGraphicsView):
         self.scene.addPixmap(self.pixmap)
         self.setScene(self.scene)
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+        self.gps_points = get_points(self.image_path)
+        self.create_grid()
+
+    def create_grid(self):
+        lines = compute_gridlines( self.gps_points )
+        major = QPen()
+        major.setWidth(3)
+        major.setCosmetic(True)
+        major.setBrush(Qt.red)
+        minor = QPen()
+        minor.setWidth(2)
+        minor.setCosmetic(True)
+        minor.setBrush(Qt.red)
+        minor.setStyle(Qt.DashLine)
+        self.add_waypoint(23006, 16192)
+        self.add_waypoint(16192, 23006)
+        for line in lines: # line : [ [ x1, y1, x2, y2 ] ]
+            if line[1]:
+                self.scene.addLine( line[0], major )
+            else:
+                self.scene.addLine( line[0], minor )
+            print(line[0])
 
     def zoom_in_btn_press(self):
         self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
@@ -141,7 +164,7 @@ class QtImageViewer(QGraphicsView):
             self.waypoint.setPos(x, y)
             self.scene.addItem(self.waypoint)
             self.waypoints[_key] = self.waypoint
-            self.add_delete_waypoint_signal.emit(1, _key)
+            self.add_delete_waypoint_signal.emit(1, _key, x, y)
 
     # 'wheelEvent' is used for scroll zooming the image
     def wheelEvent(self, event):
