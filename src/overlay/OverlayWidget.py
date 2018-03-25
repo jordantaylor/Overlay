@@ -34,30 +34,27 @@ class OverlayWidget(QWidget):
 
 		# 'waypts' is the panel itself, it is a QWidget
 		self.waypts = QWidget()
-		self.waypts.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+		self.waypts.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
 		# 'waypts_layout' allows us to add waypoints to 'waypts'
 		# 'waypts_layout' is a QVBoxLayout so the waypoints are shown vertically
 
 		self.waypts_sublayout_1 = QVBoxLayout()
-		self.waypts_sublayout_1.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+		self.waypts_sublayout_1.setAlignment(Qt.AlignTop|Qt.AlignRight)
 
 		self.waypts_sublayout_2 = QVBoxLayout()
-		self.waypts_sublayout_2.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+		self.waypts_sublayout_2.setAlignment(Qt.AlignTop|Qt.AlignRight)
 
 		self.waypts_sublayout_3 = QVBoxLayout()
-		self.waypts_sublayout_3.setAlignment(Qt.AlignTop|Qt.AlignLeft)
-
-		self.waypts_sublayout_4 = QVBoxLayout()
-		self.waypts_sublayout_4.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+		self.waypts_sublayout_3.setAlignment(Qt.AlignTop|Qt.AlignRight)
 
 		self.waypts_layout = QHBoxLayout()
 		self.waypts_layout.setAlignment(Qt.AlignTop)
+		self.waypts_layout.setSpacing(0)
 
 		self.waypts_layout.addLayout(self.waypts_sublayout_1)
 		self.waypts_layout.addLayout(self.waypts_sublayout_2)
 		self.waypts_layout.addLayout(self.waypts_sublayout_3)
-		self.waypts_layout.addLayout(self.waypts_sublayout_4)
 		self.waypts.setLayout(self.waypts_layout)
 
 		# each waypoint will be a QWidget
@@ -69,18 +66,18 @@ class OverlayWidget(QWidget):
 			self.waypts_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
 			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
-			self.waypts_widget_label = QLabel()
-			self.waypts_widget_label.setText(chr(ord('A') + x))
+			#self.waypts_widget_label = QLabel()
+			#self.waypts_widget_label.setText(chr(ord('A') + x))
 
 			# 'waypoint_delete_btn' will display the waypoint's delete button
-			self.waypoint_delete_btn = QPushButton("X")
-			self.waypoint_delete_btn.setFixedSize(QSize(45, 45))
+			self.waypoint_delete_btn = QPushButton(chr(ord('A') + x))
+			self.waypoint_delete_btn.setFixedSize(QSize(30, 30))
 			self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('A') + x)))
 
 			# 'waypts_widget_layout' allows us to add a label and button to 'waypts_widget'
             # 'waypts_widget_layout' is a QHBoxLayout so the label and buttons are shown horizontally
 			self.waypts_widget_layout = QHBoxLayout()
-			self.waypts_widget_layout.addWidget(self.waypts_widget_label)
+			#self.waypts_widget_layout.addWidget(self.waypts_widget_label)
 			self.waypts_widget_layout.addWidget(self.waypoint_delete_btn)
 			self.waypts_widget.setLayout(self.waypts_widget_layout)
 
@@ -163,22 +160,20 @@ class OverlayWidget(QWidget):
 	# 'del_hide_waypoint' deletes the waypoint from 'waypts'
 	def del_hide_waypoint(self, _key):
 		index = ord(_key) - ord('A')
-		#self.waypts_layout.removeWidget(self.waypoint_widgets[index])
 		self.waypoint_widgets[index].hide()
+		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
 		self.viewer.delete_waypoint(_key)
 
 	# 'add_show_waypoint' adds the waypoint from 'waypts'
 	def add_show_waypoint(self, _key):
 		index = ord(_key) - ord('A')
-		self.waypoint_widgets[index].show()
-		if self.waypts_sublayout_1.count() < 7:
+		if self.waypts_sublayout_1.count() < 9:
 			self.waypts_sublayout_1.addWidget(self.waypoint_widgets[index])
-		elif self.waypts_sublayout_2.count() < 7:
+		elif self.waypts_sublayout_2.count() < 9:
 			self.waypts_sublayout_2.addWidget(self.waypoint_widgets[index])
-		elif self.waypts_sublayout_3.count() < 7:
+		elif self.waypts_sublayout_3.count() < 9:
 			self.waypts_sublayout_3.addWidget(self.waypoint_widgets[index])
-		else:
-			self.waypts_sublayout_4.addWidget(self.waypoint_widgets[index])
+		self.waypoint_widgets[index].show()
 
 	# this slot is called when a signal is passed from the QtImageViewer class
 	@pyqtSlot(int, str)
