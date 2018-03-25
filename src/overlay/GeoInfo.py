@@ -3,7 +3,6 @@ from usng import USNGtoLL, LLtoUSNG
 from PyQt5.QtCore import QLineF
 import math
 
-
 def compute_gridlines( data ):
 	# Goal: Given GPS coords of the four corners of the image, the dimensions, and the pixelsize
 	# compute the coordinates of the 1000-meter grid lines to be drawn on the tiff image
@@ -41,9 +40,6 @@ def compute_gridlines( data ):
 	lines = []
 	for i in range(0,3):
 	# Compute USNG coords of next (south east) grid intersection
-		# print( cur_usng[2], cur_usng[3] )
-
-		#print( east, north )
 
 		# If either of the grid lines goes through the scene, we want to draw it
 		if (east < int(br_usng[2])) or (north > int(br_usng[3])):
@@ -53,22 +49,18 @@ def compute_gridlines( data ):
 			next_cross = USNGtoLL(cross_usng)
 			next_cross[0] = clamp(next_cross[0]) # latitude
 			next_cross[1] = clamp(next_cross[1]) # longitude
-			print( "top_left gps:  ", clamp(tl[0]), clamp(tl[1]) )
+			# print( "top_left gps:  ", clamp(tl[0]), clamp(tl[1]) )
 			tl = [ clamp(tl[0]), clamp(tl[1]) ]
-			print( "next_cross gps:", next_cross[0], next_cross[1] )
-			print( "x span gps:", tl[1] - next_cross[1] )
-			print( "y:", next_cross[0] - tl[0] )
-			print( "pixelscale lat: ", pixelscale[0] )
-			print( "pixelscale long:", pixelscale[1] )
-			#
-			# print("Next cross:", next_cross[0], next_cross[1])
-			# print("Top left:", tl[0], tl[1] )
+			# print( "next_cross gps:", next_cross[0], next_cross[1] )
+			# print( "x span gps:", tl[1] - next_cross[1] )
+			# print( "y:", next_cross[0] - tl[0] )
+			# print( "pixelscale lat: ", pixelscale[0] )
+			# print( "pixelscale long:", pixelscale[1] )
 
 			# get the image coordinates for that gps location using pixelscale
-			# x_span = (next_cross[0] - tl[1]) / pixelscale[0]
 			x_span = abs(int( (next_cross[1] - tl[1]) / pixelscale[1] ))
 			y_span = int( (tl[0] - next_cross[0]) / pixelscale[0] )
-			print( "Cross coords px:", x_span, y_span )
+
 			if east < int(br_usng[2]):
 				lines.append( [QLineF(x_span, 0, x_span, ydim), (east % 1000 == 0) ]) #True -> 1000m gridline, False -> 100m gridline
 			if north > int(br_usng[3]):
@@ -78,28 +70,22 @@ def compute_gridlines( data ):
 			cur_usng = cross_usng.split()
 			east += 1000
 			north -= 1000
-			print( "cur_usng:", cur_usng )
 		else:
-			print( "DONE" )
 			break
 
 	return lines
 
-def get_points( filename = "C:\\Users\\jordan\\Documents\\dev\\DMS02.tif" ):
+def get_points( filename ):
 	dataset = gdal.Open(filename, gdal.GA_ReadOnly)
 	geotransform = dataset.GetGeoTransform()
 	data = {}
 	if len(geotransform) == 6:
-		# Clamp the gps coordinates to 5 decimal places (this is 1m precision, highest 
-		# possible in USNG system), and any further digits are unlikely to
-		# be meaningful since the GPS reading was from a drone
-		# Note: the geotif tags come in as [ long, lat ] and are flipped here.
+		# Note: the geotif tags come in as [ long, lat ] and are flipped here. pixelScale is also flipped
 
 		# This set uses all of the decimal places provided (13 usually- micron level precision)
 		# however there is no chance the drone has that level of accuracy, but it's unclear how to
 		# set the precision gdal uses to compute pixelScale, so either we must deal with the imprecision
 		# or get gdal to compute pixelscale using GPS coords to 5 decimal places only.
-		print("pxscale:", geotransform[5], geotransform[1] )
 		data["pxscale"] = ( geotransform[5], geotransform[1] )
 		data["tl"] = ( geotransform[3], geotransform[0] )
 		data["tr"] = ( geotransform[3], geotransform[0] + ( geotransform[1] * dataset.RasterXSize )  )
@@ -107,34 +93,6 @@ def get_points( filename = "C:\\Users\\jordan\\Documents\\dev\\DMS02.tif" ):
 		data["br"] = ( data["bl"][0], data["tr"][1] )
 		data["xdim"] = dataset.RasterXSize
 		data["ydim"] = dataset.RasterYSize
-
-		# data["pxscale"] = ( geotransform[1], geotransform[5] )
-		# data["tl"] = ( geotransform[0], geotransform[3] )
-		# data["tr"] = ( geotransform[0] + ( geotransform[1] * dataset.RasterXSize ), geotransform[3] )
-		# data["bl"] = ( geotransform[0], geotransform[3] + ( geotransform[5] * dataset.RasterYSize ) )
-		# data["br"] = ( data["tr"][0], data["bl"][1] )
-		# data["xdim"] = dataset.RasterXSize
-		# data["ydim"] = dataset.RasterYSize
-
-		# data3 = {}
-		# data3["tl"] = ( clamp(geotransform[0]), clamp(geotransform[3]) )
-		# data3["tr"] = ( clamp( clamp(geotransform[0]) + ( geotransform[1] * dataset.RasterXSize ) ), clamp(geotransform[3]) )
-		# data3["bl"] = ( clamp(geotransform[0]), clamp( clamp(geotransform[3]) + ( geotransform[5] * dataset.RasterYSize ) ) )
-		# data3["br"] = ( data3["tr"][0], data3["bl"][1])
-		# data3["xdim"] = dataset.RasterXSize
-		# data3["ydim"] = dataset.RasterYSize
-		# data3["pxsize"] = ( geotransform[1], geotransform[5] )
-# 
-		# print((data['br'][0] - data['tl'][0]) / data['pxscale'][0] )
-		# print((data['br'][1] - data['tl'][1]) / data['pxscale'][1] )
-
-		# print("HEY", (data3['br'][0] - data3['tl'][0]) / data3['pxsize'][0] )
-		# print("HEY", (data3['br'][1] - data3['tl'][1]) / data3['pxsize'][1] )
-
-		# print( geotransform[0], geotransform[3] )
-		# for k in data:
-			# print( k, data[k] )
-
 		return data
 	else:
 		return None
