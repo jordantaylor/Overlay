@@ -38,8 +38,26 @@ class OverlayWidget(QWidget):
 
 		# 'waypts_layout' allows us to add waypoints to 'waypts'
 		# 'waypts_layout' is a QVBoxLayout so the waypoints are shown vertically
-		self.waypts_layout = QVBoxLayout()
-		self.waypts_layout.setAlignment(Qt.AlignCenter)
+
+		self.waypts_sublayout_1 = QVBoxLayout()
+		self.waypts_sublayout_1.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+
+		self.waypts_sublayout_2 = QVBoxLayout()
+		self.waypts_sublayout_2.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+
+		self.waypts_sublayout_3 = QVBoxLayout()
+		self.waypts_sublayout_3.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+
+		self.waypts_sublayout_4 = QVBoxLayout()
+		self.waypts_sublayout_4.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+
+		self.waypts_layout = QHBoxLayout()
+		self.waypts_layout.setAlignment(Qt.AlignTop)
+
+		self.waypts_layout.addLayout(self.waypts_sublayout_1)
+		self.waypts_layout.addLayout(self.waypts_sublayout_2)
+		self.waypts_layout.addLayout(self.waypts_sublayout_3)
+		self.waypts_layout.addLayout(self.waypts_sublayout_4)
 		self.waypts.setLayout(self.waypts_layout)
 
 		# each waypoint will be a QWidget
@@ -145,7 +163,7 @@ class OverlayWidget(QWidget):
 	# 'del_hide_waypoint' deletes the waypoint from 'waypts'
 	def del_hide_waypoint(self, _key):
 		index = ord(_key) - ord('A')
-		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
+		#self.waypts_layout.removeWidget(self.waypoint_widgets[index])
 		self.waypoint_widgets[index].hide()
 		self.viewer.delete_waypoint(_key)
 
@@ -153,7 +171,14 @@ class OverlayWidget(QWidget):
 	def add_show_waypoint(self, _key):
 		index = ord(_key) - ord('A')
 		self.waypoint_widgets[index].show()
-		self.waypts_layout.addWidget(self.waypoint_widgets[index])
+		if self.waypts_sublayout_1.count() < 7:
+			self.waypts_sublayout_1.addWidget(self.waypoint_widgets[index])
+		elif self.waypts_sublayout_2.count() < 7:
+			self.waypts_sublayout_2.addWidget(self.waypoint_widgets[index])
+		elif self.waypts_sublayout_3.count() < 7:
+			self.waypts_sublayout_3.addWidget(self.waypoint_widgets[index])
+		else:
+			self.waypts_sublayout_4.addWidget(self.waypoint_widgets[index])
 
 	# this slot is called when a signal is passed from the QtImageViewer class
 	@pyqtSlot(int, str)
