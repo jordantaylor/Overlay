@@ -53,6 +53,7 @@ class MainWidget(QWidget):
 		#fileName, dummy = QFileDialog.getOpenFileName(None, "Open image file...")
 		self.selectTifSignal.emit(fileName)
 		#self.changeWidgetSignal.emit(1)
+		
 	@pyqtSlot()
 	def on_prevfiles_clicked(self):
 		self.changeWidgetSignal.emit(2)
