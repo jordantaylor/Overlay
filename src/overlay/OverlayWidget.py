@@ -67,8 +67,8 @@ class OverlayWidget(QWidget):
 			self.waypts_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
 			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
-			#self.waypts_widget_label = QLabel()
-			#self.waypts_widget_label.setText(chr(ord('A') + x))
+			# self.waypts_widget_label = QLabel()
+			# self.waypts_widget_label.setText(chr(ord('A') + x))
 
 			self.waypts_widget_usng = QLabel()
 
@@ -82,7 +82,7 @@ class OverlayWidget(QWidget):
 			# 'waypts_widget_layout' allows us to add a label and button to 'waypts_widget'
             # 'waypts_widget_layout' is a QHBoxLayout so the label and buttons are shown horizontally
 			self.waypts_widget_layout = QHBoxLayout()
-			#self.waypts_widget_layout.addWidget(self.waypts_widget_label)
+			# self.waypts_widget_layout.addWidget(self.waypts_widget_label)
 			self.waypts_widget_layout.addWidget(self.waypts_widget_usng)
 			self.waypts_widget_layout.addWidget(self.waypoint_delete_btn)
 			self.waypts_widget.setLayout(self.waypts_widget_layout)
@@ -138,7 +138,6 @@ class OverlayWidget(QWidget):
 		if self.viewer.image_path and self.viewer.gps_points:
 			return pixels_to_usng( x, y, self.viewer.gps_points["tl"], self.viewer.gps_points["pxscale"])
 
-
 	# 'make_connection' connects this class to the 'viewer'
 	def make_connection(self, viewer_object):
 		viewer_object.add_delete_waypoint_signal.connect(self.add_delete_waypoint_widget)
@@ -178,14 +177,12 @@ class OverlayWidget(QWidget):
 		self.loading_screen.resize(200, 200)
 		self.loading_layout = QVBoxLayout()
 		self.loading_screen.setLayout(self.loading_layout)
-
 		self.loading_screen.show()
 
 		self.viewer.set_image(filename)
 		self.viewer.gps_points = get_points(self.viewer.image_path)
 
 		self.loading_screen.close()
-
 		self.changeWidgetSignal.emit(1)
 
 	# 'make_connection' connects this class to the 'viewer'
@@ -201,15 +198,12 @@ class OverlayWidget(QWidget):
 
 	# 'add_show_waypoint' adds the waypoint from 'waypts'
 	def add_show_waypoint(self, _key):
-
-			#self.temp_list = list(self.waypoint_widgets)
 			for x in self.waypoint_widgets:
 				self.waypts_layout.removeWidget(x)
 
 			index = ord(_key) - ord('A')
 			self.waypoint_widgets[index].show()
 
-			#self.waypoint_widgets = self.temp_list
 			count = 0
 			for x in self.waypoint_widgets:
 				self.waypts_layout.update()
