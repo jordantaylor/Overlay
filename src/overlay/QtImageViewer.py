@@ -15,7 +15,6 @@ class QtImageViewer(QGraphicsView):
         ###################################
         # Initialize variables
         ###################################
-
         # 'cur_path' is used to generate the paths for the images used within the image viewer
         self.cur_path = os.path.dirname(__file__)
 
@@ -50,57 +49,65 @@ class QtImageViewer(QGraphicsView):
         # 'vlayout' controls the vertical placement of the onscreen buttons
         self.vlayout = QBoxLayout(QBoxLayout.TopToBottom)
         self.vlayout.setAlignment(Qt.AlignTop|Qt.AlignRight)
-        self.vlayout.addSpacing(80)
+
+        self.init_navbtns()
+        self.setLayout(self.vlayout)
+
+        # 'hlayout' controls the horizontal placement of the onscreen buttons
+        self.hlayout = QHBoxLayout()
+        self.hlayout.setAlignment(Qt.AlignRight)
+        self.hlayout.addSpacing(50)
+        self.vlayout.addLayout(self.hlayout)
 
         # 'hlayout' controls the horizontal placement of the onscreen buttons
         self.hlayout = QHBoxLayout()
         self.hlayout.setAlignment(Qt.AlignRight)
         self.hlayout.addSpacing(110)
         self.vlayout.addLayout(self.hlayout)
-
-        # directly below, five buttons are added to the layout of the image viewer
+        
+        self.setLayout(self.vlayout)
+        
+    # set up all of the nav buttons that appear over the map
+    def init_navbtns(self):
         zoom_in_btn = QPushButton()
-        zoom_in_btn.setFixedSize(QSize(45, 45))
+        zoom_in_btn.setFixedSize(QSize(35, 35))
         zoom_in_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/zoom_in.png')))
-        zoom_in_btn.setIconSize(QSize(35, 35))
+        zoom_in_btn.setIconSize(QSize(25, 25))
         zoom_in_btn.setToolTip("zoom in to image")
         zoom_in_btn.clicked.connect(self.zoom_in_btn_press)
         self.vlayout.addWidget(zoom_in_btn)
 
         zoom_out_btn = QPushButton()
-        zoom_out_btn.setFixedSize(QSize(45, 45))
+        zoom_out_btn.setFixedSize(QSize(35, 35))
         zoom_out_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/zoom_out.png')))
-        zoom_out_btn.setIconSize(QSize(35, 35))
+        zoom_out_btn.setIconSize(QSize(25, 25))
         zoom_out_btn.setToolTip("zoom out of image")
         zoom_out_btn.clicked.connect(self.zoom_out_btn_press)
         self.vlayout.addWidget(zoom_out_btn)
 
         expand_btn = QPushButton()
-        expand_btn.setFixedSize(QSize(45, 45))
+        expand_btn.setFixedSize(QSize(35, 35))
         expand_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/expand.png')))
-        expand_btn.setIconSize(QSize(35, 35))
+        expand_btn.setIconSize(QSize(25, 25))
         expand_btn.setToolTip("reset zoom level")
         expand_btn.clicked.connect(self.expand_btn_press)
         self.vlayout.addWidget(expand_btn)
 
         visibility_wpts_btn = QPushButton()
-        visibility_wpts_btn.setFixedSize(QSize(45, 45))
+        visibility_wpts_btn.setFixedSize(QSize(35, 35))
         visibility_wpts_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/visibility.png')))
-        visibility_wpts_btn.setIconSize(QSize(35, 35))
+        visibility_wpts_btn.setIconSize(QSize(25, 25))
         visibility_wpts_btn.setToolTip("hide/show all waypoints")
         visibility_wpts_btn.clicked.connect(self.visibility_wpts_btn_press)
         self.vlayout.addWidget(visibility_wpts_btn)
 
         undo_wpt_btn = QPushButton()
-        undo_wpt_btn.setFixedSize(QSize(45, 45))
+        undo_wpt_btn.setFixedSize(QSize(35, 35))
         undo_wpt_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/undo.png')))
-        undo_wpt_btn.setIconSize(QSize(35, 35))
+        undo_wpt_btn.setIconSize(QSize(25, 25))
         undo_wpt_btn.setToolTip("undo last added waypoint")
         undo_wpt_btn.clicked.connect(self.undo_wpt_btn_press)
         self.vlayout.addWidget(undo_wpt_btn)
-
-        # the onscreen button layout is set
-        self.setLayout(self.vlayout)
 
     ###################################
     # Helper functions
@@ -120,16 +127,14 @@ class QtImageViewer(QGraphicsView):
     def create_grid(self):
         lines = compute_gridlines( self.gps_points )
         major = QPen()
-        major.setWidth(3)
+        major.setWidth(2)
         major.setCosmetic(True)
         major.setBrush(Qt.red)
         minor = QPen()
-        minor.setWidth(2)
+        minor.setWidth(1)
         minor.setCosmetic(True)
         minor.setBrush(Qt.red)
         minor.setStyle(Qt.DashLine)
-        self.add_waypoint(23006, 16192)
-        self.add_waypoint(16192, 23006)
         for line in lines: # line : [ [ x1, y1, x2, y2 ] ]
             if line[1]:
                 self.scene.addLine( line[0], major )
@@ -164,6 +169,7 @@ class QtImageViewer(QGraphicsView):
         if self.waypoints and _key not in self.key_array:
             self.scene.removeItem(self.waypoints[_key])
             self.key_array.append(_key)
+
             self.key_array.sort(reverse = True)
             del self.waypoints[_key]
 
@@ -240,3 +246,5 @@ class QtImageViewer(QGraphicsView):
         QGraphicsView.mouseReleaseEvent(self, event)
         if event.button() == Qt.LeftButton:
             self.setDragMode(QGraphicsView.NoDrag)
+
+#########################################################################################
