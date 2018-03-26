@@ -5,7 +5,8 @@ pyqt5 python application for rendering an overlay for an uploaded .tif orthomosa
 run with 'python Main.py' from src/overlay/
 
 in dependencies folder are wheels for installing gdal in order to get the gps coordinates of corners of the image.
-use them as 'pip install example_wheel.whl' (if on windows)
+install the correct one with 'pip install example_wheel.whl' (in admin cmd on windows)
+
 for unix-like and linux, follow https://pypi.python.org/pypi/GDAL in the unix subsection with easy_install.
 
 Contributing
