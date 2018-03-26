@@ -211,7 +211,7 @@ class QtImageViewer(QGraphicsView):
 
     def undo_wpt_btn_press(self):
         if self.waypoints:
-            self.add_delete_waypoint_signal.emit(0, list(self.waypoints.keys())[-1])
+            self.add_delete_waypoint_signal.emit(0, list(self.waypoints.keys())[-1], 0, 0)
 
     ###################################
     # Mouse interaction functions
