@@ -3,11 +3,16 @@ import collections
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from GeoInfo import *
 
 class QtImageViewer(QGraphicsView):
     
+<<<<<<< HEAD
     # 'add_delete_waypoint_signal' is used to communicate with the class 'OverlayWidget'
     add_delete_waypoint_signal = pyqtSignal(int, str)
+=======
+    add_delete_waypoint_signal = pyqtSignal(int, str, int, int)
+>>>>>>> 65d29ce639b7b4b1923f9b9a869f4d60e45bef7d
 
     def __init__(self):
 
@@ -112,6 +117,28 @@ class QtImageViewer(QGraphicsView):
         self.scene.addPixmap(self.pixmap)
         self.setScene(self.scene)
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+        self.gps_points = get_points(self.image_path)
+        self.create_grid()
+
+    def create_grid(self):
+        lines = compute_gridlines( self.gps_points )
+        major = QPen()
+        major.setWidth(3)
+        major.setCosmetic(True)
+        major.setBrush(Qt.red)
+        minor = QPen()
+        minor.setWidth(2)
+        minor.setCosmetic(True)
+        minor.setBrush(Qt.red)
+        minor.setStyle(Qt.DashLine)
+        self.add_waypoint(23006, 16192)
+        self.add_waypoint(16192, 23006)
+        for line in lines: # line : [ [ x1, y1, x2, y2 ] ]
+            if line[1]:
+                self.scene.addLine( line[0], major )
+            else:
+                self.scene.addLine( line[0], minor )
+            print(line[0])
 
     # 'zoom_in' handles the zooming of the image and the related scaling of the waypoints
     def zoom_in(self):
@@ -193,7 +220,23 @@ class QtImageViewer(QGraphicsView):
     # Mouse interaction functions
     ###################################
 
+<<<<<<< HEAD
     # 'wheelEvent' is used to register zooming of the image with the mouse scroll wheel
+=======
+    # 'add_waypoint' adds a waypoint to the image if there are remaining keys in the 'key_array'
+    def add_waypoint(self, x, y):
+        if self.key_array:
+            _key = self.key_array.pop()
+            _alpha_pin_path = '../../assets/pins/pin_' + _key + '.png'
+            self.waypoint_icon = QPixmap(os.path.join(self.cur_path, _alpha_pin_path))
+            self.waypoint = QGraphicsPixmapItem(self.waypoint_icon)
+            self.waypoint.setPos(x, y)
+            self.scene.addItem(self.waypoint)
+            self.waypoints[_key] = self.waypoint
+            self.add_delete_waypoint_signal.emit(1, _key, x, y)
+
+    # 'wheelEvent' is used for scroll zooming the image
+>>>>>>> 65d29ce639b7b4b1923f9b9a869f4d60e45bef7d
     def wheelEvent(self, event):
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         if event.angleDelta().y() > 0:

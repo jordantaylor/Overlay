@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from QtImageViewer import QtImageViewer
+from GeoInfo import *
 
 class OverlayWidget(QWidget):
 	########################################################################
@@ -69,15 +70,20 @@ class OverlayWidget(QWidget):
 			#self.waypts_widget_label = QLabel()
 			#self.waypts_widget_label.setText(chr(ord('A') + x))
 
+			self.waypts_widget_usng = QLabel()
+
 			# 'waypoint_delete_btn' will display the waypoint's delete button
-			self.waypoint_delete_btn = QPushButton(chr(ord('A') + x))
-			self.waypoint_delete_btn.setFixedSize(QSize(30, 30))
+			#self.waypoint_delete_btn = QPushButton(chr(ord('A') + x))
+      
+			self.waypoint_delete_btn = QPushButton("X")
+			self.waypoint_delete_btn.setFixedSize(QSize(20, 20))
 			self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('A') + x)))
 
 			# 'waypts_widget_layout' allows us to add a label and button to 'waypts_widget'
             # 'waypts_widget_layout' is a QHBoxLayout so the label and buttons are shown horizontally
 			self.waypts_widget_layout = QHBoxLayout()
-			#self.waypts_widget_layout.addWidget(self.waypts_widget_label)
+			self.waypts_widget_layout.addWidget(self.waypts_widget_label)
+			self.waypts_widget_layout.addWidget(self.waypts_widget_usng)
 			self.waypts_widget_layout.addWidget(self.waypoint_delete_btn)
 			self.waypts_widget.setLayout(self.waypts_widget_layout)
 
@@ -125,6 +131,34 @@ class OverlayWidget(QWidget):
 	# 	column = int(x)
 	# 	print("Pixel (row="+str(row)+", column="+str(column)+")")
 
+	# For use in labeling waypoints, returns a USNG string given x,y in scene coordinates
+	# If no image is loaded, does nothing
+	def getUSNG ( self, x, y ):
+		# This should do nothing if there isn't an image loaded (no image path)
+		if self.viewer.image_path and self.viewer.gps_points:
+			return pixels_to_usng( x, y, self.viewer.gps_points["tl"], self.viewer.gps_points["pxscale"])
+
+
+	# 'make_connection' connects this class to the 'viewer'
+	def make_connection(self, viewer_object):
+		viewer_object.add_delete_waypoint_signal.connect(self.add_delete_waypoint_widget)
+
+	# 'del_hide_waypoint' deletes the waypoint from 'waypts'
+	def del_hide_waypoint(self, _key):
+		index = ord(_key) - ord('A')
+		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
+		self.waypoint_widgets[index].hide()
+		self.viewer.delete_waypoint(_key)
+
+	# 'add_show_waypoint' adds the waypoint from 'waypts'
+	def add_show_waypoint(self, _key, label):
+		index = ord(_key) - ord('A')
+		self.waypoint_widgets[index].layout().itemAt(1).widget().setText(label)
+		self.waypoint_widgets[index].show()
+		self.waypts_layout.addWidget(self.waypoint_widgets[index])
+
+	# Slots
+
 	@pyqtSlot()
 	def on_start_clicked(self):
 		self.changeWidgetSignal.emit(0)
@@ -148,6 +182,7 @@ class OverlayWidget(QWidget):
 		self.loading_screen.show()
 
 		self.viewer.set_image(filename)
+		self.viewer.gps_points = get_points(self.viewer.image_path)
 
 		self.loading_screen.close()
 
@@ -176,10 +211,11 @@ class OverlayWidget(QWidget):
 		self.waypoint_widgets[index].show()
 
 	# this slot is called when a signal is passed from the QtImageViewer class
-	@pyqtSlot(int, str)
-	def add_delete_waypoint_widget(self, flag, _key):
+	@pyqtSlot(int, str, int, int)
+	def add_delete_waypoint_widget(self, flag, _key, x, y):
 		if flag is 1:
-			self.add_show_waypoint(_key)
+			label = self.getUSNG(x, y)
+			self.add_show_waypoint(_key, label)
 		else:
 			self.del_hide_waypoint(_key)
 
