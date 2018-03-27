@@ -116,7 +116,10 @@ class QtImageViewer(QGraphicsView):
     # 'set_image' is called by 'OverlayWidget' to add the .tif image to the image viewer
     def set_image(self, str):
         self.image_path = str
+        #self.image = QImageReader(self.image_path)
+        #self.image.setScaledSize(QSize(35, 35))
         self.pixmap = QPixmap(self.image_path)
+        #self.pixmap = QPixmap.fromImage(self.image)
         self.scene = QGraphicsScene()
         self.scene.addPixmap(self.pixmap)
         self.setScene(self.scene)
