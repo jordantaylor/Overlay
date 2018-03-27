@@ -39,7 +39,7 @@ class OverlayWidget(QWidget):
 		self.subgridlayout.addWidget(self.viewer,0,0,10,10)
 
 		self.mainlayout = QHBoxLayout()
-		self.mainlayout.addWidget(self.waypts, 1)
+		self.mainlayout.addWidget(self.scrollarea, 1)
 		self.mainlayout.addLayout(self.subgridlayout, 3)
 
 		self.whyyyy = QVBoxLayout()
@@ -63,25 +63,20 @@ class OverlayWidget(QWidget):
 		# 'waypts' is the panel itself, it is a QWidget
 		self.waypts = QWidget()
 		self.waypts.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+		self.scrollarea = QScrollArea()
+		self.scrollarea.setWidget(self.waypts)
+		self.scrollarea.setWidgetResizable(True)
 
 		# 'waypts_layout' allows us to add waypoints to 'waypts'
 		# 'waypts_layout' is a QVBoxLayout so the waypoints are shown vertically
-		self.waypts_sublayout_1 = QVBoxLayout()
-		self.waypts_sublayout_1.setAlignment(Qt.AlignTop|Qt.AlignLeft)
-
-		self.waypts_sublayout_2 = QVBoxLayout()
-		self.waypts_sublayout_2.setAlignment(Qt.AlignTop|Qt.AlignLeft)
-
-		self.waypts_sublayout_3 = QVBoxLayout()
-		self.waypts_sublayout_3.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+		self.waypts_sublayout = QVBoxLayout()
+		self.waypts_sublayout.setAlignment(Qt.AlignTop|Qt.AlignCenter)
 
 		self.waypts_layout = QHBoxLayout()
 		self.waypts_layout.setAlignment(Qt.AlignTop)
 		self.waypts_layout.setSpacing(0)
 
-		self.waypts_layout.addLayout(self.waypts_sublayout_1)
-		self.waypts_layout.addLayout(self.waypts_sublayout_2)
-		self.waypts_layout.addLayout(self.waypts_sublayout_3)
+		self.waypts_layout.addLayout(self.waypts_sublayout)
 		self.waypts.setLayout(self.waypts_layout)
 
 		# each waypoint will be a QWidget
@@ -177,13 +172,7 @@ class OverlayWidget(QWidget):
 			for x in self.waypoint_widgets:
 				self.waypts_layout.update()
 				if x.isVisible():
-					if count > -1 and count < 9:
-						self.waypts_sublayout_1.addWidget(x)
-					elif count > 8 and count < 18:
-						self.waypts_sublayout_2.addWidget(x)
-					elif count > 17 and count < 26:
-						self.waypts_sublayout_3.addWidget(x)
-					count += 1
+					self.waypts_sublayout.addWidget(x)
 
 	def hide_sidebar(self):
 		if self.waypts.isVisible():

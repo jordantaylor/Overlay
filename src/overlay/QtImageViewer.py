@@ -24,11 +24,11 @@ class QtImageViewer(QGraphicsView):
         self.zoom_level = 0
 
         # the following variables are used to scale waypoints with relation to the image
-        self.wpt_cur_scale = 3.6
-        self.wpt_def_scale = 3.6
-        self.wpt_max_scale = 3.6
-        self.wpt_min_scale = 0.2
-        self.wpt_scale_factor = 0.2
+        self.wpt_cur_scale = 2.0
+        self.wpt_def_scale = 2.0
+        self.wpt_max_scale = 2.0
+        self.wpt_min_scale = 0.5
+        self.wpt_scale_factor = 0.5
 
         # 'key_array' holds the alphabetical keys associated with each waypoint
         # 'key_array' is in the order Z through A
@@ -116,10 +116,7 @@ class QtImageViewer(QGraphicsView):
     # 'set_image' is called by 'OverlayWidget' to add the .tif image to the image viewer
     def set_image(self, str):
         self.image_path = str
-        #self.image = QImageReader(self.image_path)
-        #self.image.setScaledSize(QSize(35, 35))
         self.pixmap = QPixmap(self.image_path)
-        #self.pixmap = QPixmap.fromImage(self.image)
         self.scene = QGraphicsScene()
         self.scene.addPixmap(self.pixmap)
         self.setScene(self.scene)
