@@ -2,14 +2,18 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QApplication, QFileDia
 from PyQt5.QtCore import QRect, pyqtSlot, pyqtSignal
 
 class MainWidget(QWidget):
+	########################################################################
+	# Widget seen on program startup giving options to open, load, and 
+	# any buttons to aid in testing during development
+	#
+	# Second highest priority
+	#
+	########################################################################
 	changeWidgetSignal = pyqtSignal(int)
 	selectTifSignal = pyqtSignal(str)
 	def __init__(self):
 		super().__init__()
 		self.initUI()
-
-#### Initialization Functions ###########################################################
-
 	def initUI(self):
 		# self.layout = QLayout()
 		#self.layout.addWidget(QLabel("MainWidget"))
@@ -42,8 +46,6 @@ class MainWidget(QWidget):
 		QuitBtn.setGeometry(QRect(325,290,150,30))
 		QuitBtn.clicked.connect(QApplication.instance().quit)
 
-#### Slots ##############################################################################
-
 	@pyqtSlot()
 	def on_opentif_clicked(self):
 		# when main tiff button clicked, first get a filename then 
@@ -51,9 +53,7 @@ class MainWidget(QWidget):
 		#fileName, dummy = QFileDialog.getOpenFileName(None, "Open image file...")
 		self.selectTifSignal.emit(fileName)
 		#self.changeWidgetSignal.emit(1)
-		
 	@pyqtSlot()
 	def on_prevfiles_clicked(self):
 		self.changeWidgetSignal.emit(2)
-
-#########################################################################################
+	########################################################################
