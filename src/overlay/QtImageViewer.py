@@ -124,6 +124,8 @@ class QtImageViewer(QGraphicsView):
         self.gps_points = get_points(self.image_path)
         self.create_grid()
 
+        #self.setSceneRect(self.sceneRect().x(), self.sceneRect().y(), self.sceneRect().width() + 1000, self.sceneRect().height() + 1000)
+
     def create_grid(self):
         lines = compute_gridlines( self.gps_points )
         major = QPen()
