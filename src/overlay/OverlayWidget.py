@@ -82,24 +82,28 @@ class OverlayWidget(QWidget):
 		# each waypoint will be a QWidget
 		self.waypoint_widgets = []
 
-		for x in range(0, 26):
+		for x in range(0, 36):
 			# each waypoint's QWidget 'waypts_widget' is created
 			self.waypts_widget = QWidget()
 			self.waypts_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
 			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
 			self.waypts_widget_label = QLabel()
-			self.waypts_widget_label.setText(chr(ord('A') + x))
+			if x > 25:
+				self.waypts_widget_label.setText(chr(ord('0') + x - 26))
+			else:
+				self.waypts_widget_label.setText(chr(ord('A') + x))
 
 			# this label is left empty until set with a waypoint's coordinates when it is placed
 			self.waypts_widget_usng = QLabel()
 
 			# 'waypoint_delete_btn' will display the waypoint's delete button
 			self.waypoint_delete_btn = QPushButton('X')
-			
-			#self.waypoint_delete_btn = QPushButton("X")
 			self.waypoint_delete_btn.setFixedSize(QSize(35, 35))
-			self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('A') + x)))
+			if x > 25:
+				self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('0') + x - 26)))
+			else:
+				self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('A') + x)))
 
 			# 'waypts_widget_layout' allows us to add a label and button to 'waypts_widget'
 			# 'waypts_widget_layout' is a QHBoxLayout so the label and buttons are shown horizontally
@@ -133,46 +137,38 @@ class OverlayWidget(QWidget):
 
 	# 'del_hide_waypoint' deletes the waypoint from 'waypts'
 	def del_hide_waypoint(self, _key):
-		index = ord(_key) - ord('A')
-		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
+		index = 0
+		if _key.isnumeric():
+			index = ord(_key) - ord('0') + 26
+		else:
+			index = ord(_key) - ord('A')
+			
 		self.waypoint_widgets[index].hide()
+		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
 		self.viewer.delete_waypoint(_key)
 
 	# 'add_show_waypoint' adds the waypoint from 'waypts'
 	def add_show_waypoint(self, _key, label):
-		index = ord(_key) - ord('A')
+		for x in self.waypoint_widgets:
+			self.waypts_layout.removeWidget(x)
+
+		index = 0
+		if _key.isnumeric():
+			index = ord(_key) - ord('0') + 26
+		else:
+			index = ord(_key) - ord('A')
+
+		self.waypoint_widgets[index].show()
+
+		# Set the waypoint's USNG coordinates label if given
 		self.waypoint_widgets[index].layout().itemAt(1).widget().setText(label)
 		self.waypoint_widgets[index].show()
-		self.waypts_layout.addWidget(self.waypoint_widgets[index])
 
-	# 'make_connection' connects this class to the 'viewer'
-	def make_connection(self, viewer_object):
-		viewer_object.add_delete_waypoint_signal.connect(self.add_delete_waypoint_widget)
-
-	# 'del_hide_waypoint' deletes the waypoint from 'waypts'
-	def del_hide_waypoint(self, _key):
-		index = ord(_key) - ord('A')
-		self.waypoint_widgets[index].hide()
-		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
-		self.viewer.delete_waypoint(_key)
-
-	# 'add_show_waypoint' adds the waypoint from 'waypts'
-	def add_show_waypoint(self, _key, label):
-			for x in self.waypoint_widgets:
-				self.waypts_layout.removeWidget(x)
-
-			index = ord(_key) - ord('A')
-			self.waypoint_widgets[index].show()
-
-			# Set the waypoint's USNG coordinates label if given
-			self.waypoint_widgets[index].layout().itemAt(1).widget().setText(label)
-			self.waypoint_widgets[index].show()
-
-			count = 0
-			for x in self.waypoint_widgets:
-				self.waypts_layout.update()
-				if x.isVisible():
-					self.waypts_sublayout.addWidget(x)
+		count = 0
+		for x in self.waypoint_widgets:
+			self.waypts_layout.update()
+			if x.isVisible():
+				self.waypts_sublayout.addWidget(x)
 
 	def hide_sidebar(self):
 		if self.waypts.isVisible():

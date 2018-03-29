@@ -19,22 +19,22 @@ class QtImageViewer(QGraphicsView):
         self.cur_path = os.path.dirname(__file__)
 
         # the following variables are used to scale the image
-        self.zoom_max = 15
-        self.zoom_min = -2
         self.zoom_level = 0
+        self.zoom_max = 15
+        self.zoom_min = 0
 
         # the following variables are used to scale waypoints with relation to the image
-        self.wpt_cur_scale = 2.0
-        self.wpt_def_scale = 2.0
-        self.wpt_max_scale = 2.0
-        self.wpt_min_scale = 0.5
-        self.wpt_scale_factor = 0.5
+        self.wpt_cur_scale = 12.0
+        self.wpt_max_scale = 12.0
+        self.wpt_min_scale = 0
 
         # 'key_array' holds the alphabetical keys associated with each waypoint
         # 'key_array' is in the order Z through A
-        self.key_array = [] 
-        for x in range(0, 26):
-            self.key_array.append(chr(ord('Z') - x))
+        self.key_array = []
+        for x in range(0, 10):
+            self.key_array.append(chr(ord('9') - x))
+        for y in range(0, 26):
+            self.key_array.append(chr(ord('Z') - y))
 
         # 'waypoints' holds all waypoints in the order that they are added to the screen
         self.waypoints = collections.OrderedDict()
@@ -124,8 +124,6 @@ class QtImageViewer(QGraphicsView):
         self.gps_points = get_points(self.image_path)
         self.create_grid()
 
-        #self.setSceneRect(self.sceneRect().x(), self.sceneRect().y(), self.sceneRect().width() + 1000, self.sceneRect().height() + 1000)
-
     def create_grid(self):
         lines = compute_gridlines( self.gps_points )
         major = QPen()
@@ -149,8 +147,7 @@ class QtImageViewer(QGraphicsView):
         if self.zoom_level < self.zoom_max:
             self.scale(1.25, 1.25)
             self.zoom_level += 1
-            if self.wpt_cur_scale > self.wpt_min_scale:
-                self.wpt_cur_scale -= self.wpt_scale_factor
+            self.wpt_cur_scale *= 0.8
             if self.waypoints:
                 for key, val in self.waypoints.items():
                     val.setScale(self.wpt_cur_scale)
@@ -160,8 +157,7 @@ class QtImageViewer(QGraphicsView):
         if self.zoom_level > self.zoom_min:
             self.scale(0.8, 0.8)
             self.zoom_level -= 1
-            if self.wpt_cur_scale < self.wpt_max_scale:
-                self.wpt_cur_scale += self.wpt_scale_factor
+            self.wpt_cur_scale *= 1.25
             if self.waypoints:
                 for key, val in self.waypoints.items():
                     val.setScale(self.wpt_cur_scale)
@@ -171,8 +167,14 @@ class QtImageViewer(QGraphicsView):
         if self.waypoints and _key not in self.key_array:
             self.scene.removeItem(self.waypoints[_key])
             self.key_array.append(_key)
-
+            num_keys = []
+            for x in self.key_array[:]:
+                if x.isnumeric():
+                    num_keys.append(x)
+                    self.key_array.remove(x)
             self.key_array.sort(reverse = True)
+            num_keys.sort(reverse = True)
+            self.key_array = num_keys + self.key_array
             del self.waypoints[_key]
 
     # 'add_waypoint' adds a waypoint to the image if there are less than 26 on screen
@@ -182,12 +184,13 @@ class QtImageViewer(QGraphicsView):
             _alpha_pin_path = '../../assets/pins/pin_' + _key + '.png'
             self.waypoint_icon = QPixmap(os.path.join(self.cur_path, _alpha_pin_path))
             self.waypoint = QGraphicsPixmapItem(self.waypoint_icon)
-            self.waypoint.setTransformOriginPoint(0, self.waypoint_icon.height())
-            self.waypoint.setPos(x, y - self.waypoint_icon.height())
+            #self.waypoint.setTransformOriginPoint(0, self.waypoint_icon.height())
+            self.waypoint.setTransformOriginPoint(self.waypoint_icon.width() / 2, self.waypoint_icon.height())
+            self.waypoint.setPos(x - (self.waypoint_icon.width() / 2), y - self.waypoint_icon.height())
             self.waypoint.setScale(self.wpt_cur_scale)
             self.scene.addItem(self.waypoint)
             self.waypoints[_key] = self.waypoint
-            self.add_delete_waypoint_signal.emit(1, _key, x, y - self.waypoint_icon.height())
+            self.add_delete_waypoint_signal.emit(1, _key, x - (self.waypoint_icon.width() / 2), y - self.waypoint_icon.height())
 
     ###################################
     # Button press functions
@@ -203,11 +206,11 @@ class QtImageViewer(QGraphicsView):
 
     def expand_btn_press(self):
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
-        self.zoom_level = 0
+        self.zoom_level = self.zoom_min
+        self.wpt_cur_scale = self.wpt_max_scale
         if self.waypoints:
-            self.wpt_cur_scale = self.wpt_def_scale
             for key, val in self.waypoints.items():
-                val.setScale(self.wpt_def_scale)
+                val.setScale(self.wpt_cur_scale)
 
     def visibility_wpts_btn_press(self):
         if self.waypoints and self.waypoints[list(self.waypoints.keys())[0]].isVisible():
@@ -233,8 +236,8 @@ class QtImageViewer(QGraphicsView):
         else:
             self.zoom_out()
 
-    # 'mousePressEvent' is to register panning of the image with the left mouse button
-    # 'mousePressEvent' is to register the adding of waypoints with the right mouse button
+    # 'mousePressEvent' is used to register panning of the image with the left mouse button
+    # 'mousePressEvent' is used to register the adding of waypoints with the right mouse button
     def mousePressEvent(self, event):
         scenePos = self.mapToScene(event.pos())
         if event.button() == Qt.RightButton:
