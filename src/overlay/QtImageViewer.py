@@ -135,13 +135,8 @@ class QtImageViewer(QGraphicsView):
     def download_png_press(self):
         ignore, fileName = QFileDialog.getSaveFileName(self, 'Save image', QCoreApplication.applicationDirPath(), 'PNG (*.png)')
         if fileName:
-            #png = self.grab()
-            #png.save(fileName)
-            #self.scene.clearSelection()
-            #self.scene.setSceneRect(self.scene.itemsBoundingRect())
             self.image = QImage(self.scene.sceneRect().size().toSize(), QImage.Format_ARGB32)
-
-            #self.image.fill(Qt.transparent)
+            self.image.fill(Qt.transparent)
             self.painter = QPainter(self.image)
             self.painter.setRenderHints(QPainter.Antialiasing)
             self.scene.render(self.painter)
