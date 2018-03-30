@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QApplication, QFileDialog
-from PyQt5.QtCore import QRect, pyqtSlot, pyqtSignal
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
 class MainWidget(QWidget):
 	########################################################################
@@ -11,48 +11,40 @@ class MainWidget(QWidget):
 	########################################################################
 	changeWidgetSignal = pyqtSignal(int)
 	selectTifSignal = pyqtSignal(str)
+	
 	def __init__(self):
 		super().__init__()
 		self.initUI()
 	def initUI(self):
-		# self.layout = QLayout()
-		#self.layout.addWidget(QLabel("MainWidget"))
-		title = QLabel("Main Widget")
-		title.setGeometry(QRect(325,90,150,30))
+		self.layout = QVBoxLayout()
+		self.layout.setAlignment(Qt.AlignCenter|Qt.AlignCenter)
 		self.initBtns()
-		# self.setLayout(self.layout)
+		self.setLayout(self.layout)
 	
 	def initBtns(self):
 		# OpenTiffBtn#
 		OpenTiffBtn = QPushButton('Open a TIFF file',self)
-		# self.layout.addWidget(OpenTiffBtn)
-		OpenTiffBtn.setGeometry(QRect(325,140,150,30))
+		OpenTiffBtn.setFixedSize(QSize(225, 100))
 		OpenTiffBtn.clicked.connect(self.on_opentif_clicked)
+		self.layout.addWidget(OpenTiffBtn)
 
 		# OpenPrevBtn#
-		OpenPrevBtn = QPushButton("Open from Previous Files",self)
-		# self.layout.addWidget(OpenPrevBtn)
-		OpenPrevBtn.setGeometry(QRect(325,190,150,30))
+		OpenPrevBtn = QPushButton("Previous Files",self)
+		OpenPrevBtn.setFixedSize(QSize(225, 100))
 		OpenPrevBtn.clicked.connect(self.on_prevfiles_clicked)
-
-		# OpenTestBtn#
-		OpenTestBtn = QPushButton("[TESTING] Open DMS02.tif",self)
-		# self.layout.addWidget(OpenTestBtn)
-		OpenTestBtn.setGeometry(QRect(325,240,150,30))
+		self.layout.addWidget(OpenPrevBtn)
 
 		# QuitBtn#
 		QuitBtn = QPushButton("Exit",self)
-		# self.layout.addWidget(QuitBtn)
-		QuitBtn.setGeometry(QRect(325,290,150,30))
+		QuitBtn.setFixedSize(QSize(225, 100))
 		QuitBtn.clicked.connect(QApplication.instance().quit)
+		self.layout.addWidget(QuitBtn)
 
 	@pyqtSlot()
 	def on_opentif_clicked(self):
-		# when main tiff button clicked, first get a filename then 
+		# when main tiff button clicked, first get a filename then
 		fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","TIFF Files (*.tif)")
-		#fileName, dummy = QFileDialog.getOpenFileName(None, "Open image file...")
 		self.selectTifSignal.emit(fileName)
-		#self.changeWidgetSignal.emit(1)
 		
 	@pyqtSlot()
 	def on_prevfiles_clicked(self):

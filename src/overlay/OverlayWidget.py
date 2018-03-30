@@ -40,7 +40,7 @@ class OverlayWidget(QWidget):
 
 		self.mainlayout = QHBoxLayout()
 		self.mainlayout.addWidget(self.scrollarea, 1)
-		self.mainlayout.addLayout(self.subgridlayout, 3)
+		self.mainlayout.addLayout(self.subgridlayout, 5)
 
 		self.whyyyy = QVBoxLayout()
 		self.whyyyy.addLayout(self.navlayout)

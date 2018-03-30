@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QRect, pyqtSlot, pyqtSignal
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 from StackWidget import StackWidget
 
@@ -12,7 +12,7 @@ class Overlay(QMainWindow):
 		self.initUI()
 		
 	def initUI(self):
-		self.setGeometry(135, 200, 800, 600)
+		#self.setGeometry(135, 200, 800, 600)
 		self.setWindowTitle('USNG Overlay - Start')
 		self.setWindowIcon(QIcon('..\\..\\assets\\gimp_pepper.png')) 
 
@@ -27,8 +27,9 @@ class Overlay(QMainWindow):
 		self.wid.page3.changeWidgetSignal.connect(self.switchWidget)
 		self.wid.page1.selectTifSignal.connect(self.wid.page2.on_load_signal)
 
-		self.center()
-		self.show()
+		#self.center()
+		#self.show()
+		self.showMaximized()
 
 	@pyqtSlot(int)
 	def switchWidget(self,widgetID):

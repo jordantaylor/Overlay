@@ -109,6 +109,14 @@ class QtImageViewer(QGraphicsView):
         undo_wpt_btn.clicked.connect(self.undo_wpt_btn_press)
         self.vlayout.addWidget(undo_wpt_btn)
 
+        download_png = QPushButton()
+        download_png.setFixedSize(QSize(35, 35))
+        download_png.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/download.png')))
+        download_png.setIconSize(QSize(25, 25))
+        download_png.setToolTip("download view as png")
+        download_png.clicked.connect(self.download_png_press)
+        self.vlayout.addWidget(download_png)
+
     ###################################
     # Helper functions
     ###################################
@@ -123,6 +131,22 @@ class QtImageViewer(QGraphicsView):
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
         self.gps_points = get_points(self.image_path)
         self.create_grid()
+
+    def download_png_press(self):
+        ignore, fileName = QFileDialog.getSaveFileName(self, 'Save image', QCoreApplication.applicationDirPath(), 'PNG (*.png)')
+        if fileName:
+            #png = self.grab()
+            #png.save(fileName)
+            #self.scene.clearSelection()
+            #self.scene.setSceneRect(self.scene.itemsBoundingRect())
+            self.image = QImage(self.scene.sceneRect().size().toSize(), QImage.Format_ARGB32)
+
+            #self.image.fill(Qt.transparent)
+            self.painter = QPainter(self.image)
+            self.painter.setRenderHints(QPainter.Antialiasing)
+            self.scene.render(self.painter)
+            self.painter.end()
+            self.image.save(fileName)
 
     def create_grid(self):
         lines = compute_gridlines( self.gps_points )
@@ -184,7 +208,6 @@ class QtImageViewer(QGraphicsView):
             _alpha_pin_path = '../../assets/pins/pin_' + _key + '.png'
             self.waypoint_icon = QPixmap(os.path.join(self.cur_path, _alpha_pin_path))
             self.waypoint = QGraphicsPixmapItem(self.waypoint_icon)
-            #self.waypoint.setTransformOriginPoint(0, self.waypoint_icon.height())
             self.waypoint.setTransformOriginPoint(self.waypoint_icon.width() / 2, self.waypoint_icon.height())
             self.waypoint.setPos(x - (self.waypoint_icon.width() / 2), y - self.waypoint_icon.height())
             self.waypoint.setScale(self.wpt_cur_scale)
