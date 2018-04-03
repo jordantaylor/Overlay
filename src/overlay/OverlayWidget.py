@@ -90,9 +90,11 @@ class OverlayWidget(QWidget):
 			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
 			self.waypts_widget_label = QLabel()
 			if x > 25:
-				self.waypts_widget_label.setText(chr(ord('0') + x - 26))
+				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('0') + x - 26) + '.png')
+				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 			else:
-				self.waypts_widget_label.setText(chr(ord('A') + x))
+				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('A') + x) + '.png')
+				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 
 			# this label is left empty until set with a waypoint's coordinates when it is placed
 			self.waypts_widget_usng = QLabel()
@@ -166,7 +168,6 @@ class OverlayWidget(QWidget):
 
 		count = 0
 		for x in self.waypoint_widgets:
-			self.waypts_layout.update()
 			if x.isVisible():
 				self.waypts_sublayout.addWidget(x)
 
@@ -189,12 +190,7 @@ class OverlayWidget(QWidget):
 	# this slot is called after user selects a filename to load from an open tif button
 	@pyqtSlot(str)
 	def on_load_signal(self,filename):
-		self.loading_screen = QWidget()
-		self.loading_screen.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
-		self.loading_screen.setWindowTitle("              Loading...")
-		self.loading_screen.resize(200, 200)
-		self.loading_layout = QVBoxLayout()
-		self.loading_screen.setLayout(self.loading_layout)
+		self.initLoadingWindow()
 		self.loading_screen.show()
 
 		self.viewer.set_image(filename)

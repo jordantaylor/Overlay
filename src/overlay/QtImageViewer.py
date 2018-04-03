@@ -10,15 +10,15 @@ class QtImageViewer(QGraphicsView):
     # 'add_delete_waypoint_signal' is used to communicate with the class 'OverlayWidget'
     add_delete_waypoint_signal = pyqtSignal(int, str, int, int)
 
-    def __init__(self):
+#### Initialization Functions ###########################################################
 
-        ###################################
-        # Initialize variables
-        ###################################
-        # 'cur_path' is used to generate the paths for the images used within the image viewer
+    def __init__(self):
+        # 'cur_path' is used to generate the paths for the .pngs
         self.cur_path = os.path.dirname(__file__)
 
-        # the following variables are used to scale the image
+        # important for upholding zoom max and min
+        # Note: May need to compute zoom limits based on distance viewable in viewport and pixelscale
+        # from geotif so size of image doesn't influence the zoom limits in real-world units
         self.zoom_level = 0
         self.zoom_max = 15
         self.zoom_min = 0
@@ -49,6 +49,7 @@ class QtImageViewer(QGraphicsView):
         # 'vlayout' controls the vertical placement of the onscreen buttons
         self.vlayout = QBoxLayout(QBoxLayout.TopToBottom)
         self.vlayout.setAlignment(Qt.AlignTop|Qt.AlignRight)
+        #self.vlayout.addSpacing(10)
 
         self.init_navbtns()
         self.setLayout(self.vlayout)
@@ -59,14 +60,6 @@ class QtImageViewer(QGraphicsView):
         self.hlayout.addSpacing(50)
         self.vlayout.addLayout(self.hlayout)
 
-        # 'hlayout' controls the horizontal placement of the onscreen buttons
-        self.hlayout = QHBoxLayout()
-        self.hlayout.setAlignment(Qt.AlignRight)
-        self.hlayout.addSpacing(110)
-        self.vlayout.addLayout(self.hlayout)
-        
-        self.setLayout(self.vlayout)
-        
     # set up all of the nav buttons that appear over the map
     def init_navbtns(self):
         zoom_in_btn = QPushButton()

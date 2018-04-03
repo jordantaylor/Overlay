@@ -2,19 +2,15 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 class MainWidget(QWidget):
-	########################################################################
-	# Widget seen on program startup giving options to open, load, and 
-	# any buttons to aid in testing during development
-	#
-	# Second highest priority
-	#
-	########################################################################
 	changeWidgetSignal = pyqtSignal(int)
 	selectTifSignal = pyqtSignal(str)
 	
 	def __init__(self):
 		super().__init__()
 		self.initUI()
+
+#### Initialization Functions ###########################################################
+
 	def initUI(self):
 		self.layout = QVBoxLayout()
 		self.layout.setAlignment(Qt.AlignCenter|Qt.AlignCenter)
@@ -40,6 +36,8 @@ class MainWidget(QWidget):
 		QuitBtn.clicked.connect(QApplication.instance().quit)
 		self.layout.addWidget(QuitBtn)
 
+#### Slots ##############################################################################
+
 	@pyqtSlot()
 	def on_opentif_clicked(self):
 		# when main tiff button clicked, first get a filename then
@@ -49,4 +47,5 @@ class MainWidget(QWidget):
 	@pyqtSlot()
 	def on_prevfiles_clicked(self):
 		self.changeWidgetSignal.emit(2)
-	########################################################################
+
+#########################################################################################
