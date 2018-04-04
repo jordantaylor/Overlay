@@ -1,12 +1,11 @@
 # overlay
 
 Functionality left to be implemented:
-- Save overlay to png, save at current zoom level (jordan)
+- Save overlay to png, save at current zoom level (kevin/jordan)
 - Save files for waypoints, save file button (andres)
 - Page for loading tifs with saved waypoints (harrison)
 - Display useful error instead of crash on loading tif without gps (jordan)
 - pyinstaller, how to handle installing python first, script to install gdal (andres)
-- program needs to start in fullscreen (kevin)
 - improve ui aesthetics
 - any error checking that can be conceived of
 - verification of the computed gridlines within margins of error
