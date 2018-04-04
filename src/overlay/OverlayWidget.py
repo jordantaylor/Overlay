@@ -39,8 +39,8 @@ class OverlayWidget(QWidget):
 		self.subgridlayout.addWidget(self.viewer,0,0,10,10)
 
 		self.mainlayout = QHBoxLayout()
-		self.mainlayout.addWidget(self.waypts, 1)
-		self.mainlayout.addLayout(self.subgridlayout, 3)
+		self.mainlayout.addWidget(self.scrollarea, 1)
+		self.mainlayout.addLayout(self.subgridlayout, 5)
 
 		self.whyyyy = QVBoxLayout()
 		self.whyyyy.addLayout(self.navlayout)
@@ -63,51 +63,52 @@ class OverlayWidget(QWidget):
 		# 'waypts' is the panel itself, it is a QWidget
 		self.waypts = QWidget()
 		self.waypts.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+		self.scrollarea = QScrollArea()
+		self.scrollarea.setWidget(self.waypts)
+		self.scrollarea.setWidgetResizable(True)
 
 		# 'waypts_layout' allows us to add waypoints to 'waypts'
 		# 'waypts_layout' is a QVBoxLayout so the waypoints are shown vertically
-		self.waypts_sublayout_1 = QVBoxLayout()
-		self.waypts_sublayout_1.setAlignment(Qt.AlignTop|Qt.AlignLeft)
-
-		self.waypts_sublayout_2 = QVBoxLayout()
-		self.waypts_sublayout_2.setAlignment(Qt.AlignTop|Qt.AlignRight)
-
-		self.waypts_sublayout_3 = QVBoxLayout()
-		self.waypts_sublayout_3.setAlignment(Qt.AlignTop|Qt.AlignRight)
+		self.waypts_sublayout = QVBoxLayout()
+		self.waypts_sublayout.setAlignment(Qt.AlignTop|Qt.AlignCenter)
 
 		self.waypts_layout = QHBoxLayout()
 		self.waypts_layout.setAlignment(Qt.AlignTop)
 		self.waypts_layout.setSpacing(0)
 
-		self.waypts_layout.addLayout(self.waypts_sublayout_1)
-		self.waypts_layout.addLayout(self.waypts_sublayout_2)
-		self.waypts_layout.addLayout(self.waypts_sublayout_3)
+		self.waypts_layout.addLayout(self.waypts_sublayout)
 		self.waypts.setLayout(self.waypts_layout)
 
 		# each waypoint will be a QWidget
 		self.waypoint_widgets = []
 
-		for x in range(0, 26):
+		for x in range(0, 36):
 			# each waypoint's QWidget 'waypts_widget' is created
 			self.waypts_widget = QWidget()
 			self.waypts_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
-			# 'waypts_widget_label' will display the waypoint's icon, which has its letter on it
+			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
 			self.waypts_widget_label = QLabel()
-
-			# Platform specific probably, should be fixed to use os library for path
-			self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('A')+x) + '.png')
-			self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35) ) )
+			if x > 25:
+				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('0') + x - 26) + '.png')
+				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
+			else:
+				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('A') + x) + '.png')
+				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 
 			# this label is left empty until set with a waypoint's coordinates when it is placed
 			self.waypts_widget_usng = QLabel()
 
-			self.waypoint_delete_btn = QPushButton("X")
-			self.waypoint_delete_btn.setFixedSize(QSize(20, 20))
-			self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('A') + x)))
+			# 'waypoint_delete_btn' will display the waypoint's delete button
+			self.waypoint_delete_btn = QPushButton('X')
+			self.waypoint_delete_btn.setFixedSize(QSize(35, 35))
+			if x > 25:
+				self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('0') + x - 26)))
+			else:
+				self.waypoint_delete_btn.clicked.connect(partial(self.del_hide_waypoint, chr(ord('A') + x)))
 
 			# 'waypts_widget_layout' allows us to add a label and button to 'waypts_widget'
-            # 'waypts_widget_layout' is a QHBoxLayout so the label and buttons are shown horizontally
+			# 'waypts_widget_layout' is a QHBoxLayout so the label and buttons are shown horizontally
 			self.waypts_widget_layout = QHBoxLayout()
 			self.waypts_widget_layout.addWidget(self.waypts_widget_label)
 			self.waypts_widget_layout.addWidget(self.waypts_widget_usng)
@@ -138,44 +139,37 @@ class OverlayWidget(QWidget):
 
 	# 'del_hide_waypoint' deletes the waypoint from 'waypts'
 	def del_hide_waypoint(self, _key):
-		index = ord(_key) - ord('A')
-		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
+		index = 0
+		if _key.isnumeric():
+			index = ord(_key) - ord('0') + 26
+		else:
+			index = ord(_key) - ord('A')
+			
 		self.waypoint_widgets[index].hide()
+		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
 		self.viewer.delete_waypoint(_key)
 
 	# 'add_show_waypoint' adds the waypoint from 'waypts'
 	def add_show_waypoint(self, _key, label):
-		index = ord(_key) - ord('A')
-		self.waypoint_widgets[index].layout().itemAt(1).widget().setText(label)
+		for x in self.waypoint_widgets:
+			self.waypts_layout.removeWidget(x)
+
+		index = 0
+		if _key.isnumeric():
+			index = ord(_key) - ord('0') + 26
+		else:
+			index = ord(_key) - ord('A')
+
 		self.waypoint_widgets[index].show()
-		self.waypts_layout.addWidget(self.waypoint_widgets[index])
-
-	# 'make_connection' connects this class to the 'viewer'
-	def make_connection(self, viewer_object):
-		viewer_object.add_delete_waypoint_signal.connect(self.add_delete_waypoint_widget)
-
-	# 'del_hide_waypoint' deletes the waypoint from 'waypts'
-	def del_hide_waypoint(self, _key):
-		index = ord(_key) - ord('A')
-		self.waypoint_widgets[index].hide()
-		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
-		self.viewer.delete_waypoint(_key)
-
-	# 'add_show_waypoint' adds the waypoint from 'waypts'
-	def add_show_waypoint(self, _key, label = ''):
-		index = ord(_key) - ord('A')
-
-		# Determine the column to add waypoint listing to on sidebar
-		if self.waypts_sublayout_1.count() < 9:
-			self.waypts_sublayout_1.addWidget(self.waypoint_widgets[index])
-		elif self.waypts_sublayout_2.count() < 9:
-			self.waypts_sublayout_2.addWidget(self.waypoint_widgets[index])
-		elif self.waypts_sublayout_3.count() < 9:
-			self.waypts_sublayout_3.addWidget(self.waypoint_widgets[index])
 
 		# Set the waypoint's USNG coordinates label if given
 		self.waypoint_widgets[index].layout().itemAt(1).widget().setText(label)
 		self.waypoint_widgets[index].show()
+
+		count = 0
+		for x in self.waypoint_widgets:
+			if x.isVisible():
+				self.waypts_sublayout.addWidget(x)
 
 	def hide_sidebar(self):
 		if self.waypts.isVisible():
@@ -196,6 +190,7 @@ class OverlayWidget(QWidget):
 	# this slot is called after user selects a filename to load from an open tif button
 	@pyqtSlot(str)
 	def on_load_signal(self,filename):
+		self.initLoadingWindow()
 		self.loading_screen.show()
 
 		self.viewer.set_image(filename)
