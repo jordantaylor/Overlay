@@ -42,7 +42,8 @@ class MainWidget(QWidget):
 	def on_opentif_clicked(self):
 		# when main tiff button clicked, first get a filename then
 		fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","TIFF Files (*.tif)")
-		self.selectTifSignal.emit(fileName)
+		if fileName:
+			self.selectTifSignal.emit(fileName)
 		
 	@pyqtSlot()
 	def on_prevfiles_clicked(self):

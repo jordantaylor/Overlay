@@ -32,13 +32,14 @@ def compute_gridlines( data ):
 
 	# The grid line to our east has a higher value, ciel to next thousand
 	# east = round( int(cur_usng[2]) + 499, -3 )
-	east = round( int(cur_usng[2]) + 499, -3 )
+	east = round( int(cur_usng[2]) + 49, -2 )
 	# The grid line to our south has a lower value, floor to previous thousand
 	# north = round( int(cur_usng[3]) - 500, -3 )
-	north = round( int(cur_usng[3]) - 500, -3 )
+	north = round( int(cur_usng[3]) - 50, -2 )
 
-	lines = []
-	for i in range(0,3):
+	lines = [ [], [] ]
+	labels = [ [], [] ]
+	for i in range(0,10):
 	# Compute USNG coords of next (south east) grid intersection
 
 		# If either of the grid lines goes through the scene, we want to draw it
@@ -59,26 +60,40 @@ def compute_gridlines( data ):
 
 			# get the image coordinates for that gps location using pixelscale
 			x_span = abs(int( (next_cross[1] - tl[1]) / pixelscale[1] ))
-			y_span = int( (tl[0] - next_cross[0]) / pixelscale[0] )
+			y_span = abs(int( (tl[0] - next_cross[0]) / pixelscale[0] ))
 
 			if east < int(br_usng[2]):
-				lines.append( [QLineF(x_span, 0, x_span, ydim), (east % 1000 == 0) ]) #True -> 1000m gridline, False -> 100m gridline
+				#True -> 1000m gridline, False -> 100m gridline
+				lines[0].append( [QLineF(x_span, 0, x_span, ydim), (east % 1000 == 0) ])
+				#Add the gridline number this line has 
+				if east % 1000 == 0:
+					labels[0].append( east//1000 )
+				else:
+					labels[0].append( east//100 )
 			if north > int(br_usng[3]):
-				lines.append( [QLineF(y_span, 0, y_span, ydim), (north % 1000 == 0) ])
+				lines[1].append( [QLineF(0, y_span, xdim, y_span), (north % 1000 == 0) ] )
+				if north % 1000 == 0:
+					labels[1].append( north//1000 )
+				else:
+					labels[1].append( north//100 )
 
 			# Update cur_usng to the just found grid intersection
 			cur_usng = cross_usng.split()
-			east += 1000
-			north -= 1000
+			east += 100
+			north -= 100
 		else:
 			break
 
-	return lines
+	return lines, labels
 
 def get_points( filename ):
 	dataset = gdal.Open(filename, gdal.GA_ReadOnly)
-	geotransform = dataset.GetGeoTransform()
 	data = {}
+	if not dataset:
+		return { "error" : "Unable to open tif file" }
+	geotransform = dataset.GetGeoTransform()
+	if not geotransform:
+		return { "error" : "Unable to read GeoTIF EXIF tags"}
 	if len(geotransform) == 6:
 		# Note: the geotif tags come in as [ long, lat ] and are flipped here. pixelScale is also flipped
 
@@ -86,16 +101,19 @@ def get_points( filename ):
 		# however there is no chance the drone has that level of accuracy, but it's unclear how to
 		# set the precision gdal uses to compute pixelScale, so either we must deal with the imprecision
 		# or get gdal to compute pixelscale using GPS coords to 5 decimal places only.
-		data["pxscale"] = ( geotransform[5], geotransform[1] )
-		data["tl"] = ( geotransform[3], geotransform[0] )
-		data["tr"] = ( geotransform[3], geotransform[0] + ( geotransform[1] * dataset.RasterXSize )  )
-		data["bl"] = ( geotransform[3] + ( geotransform[5] * dataset.RasterYSize ), geotransform[0] )
-		data["br"] = ( data["bl"][0], data["tr"][1] )
-		data["xdim"] = dataset.RasterXSize
-		data["ydim"] = dataset.RasterYSize
-		return data
+		if (-90 <= geotransform[3] <= 90) and (-180 <= geotransform[0] <= 180):
+			data["pxscale"] = ( geotransform[5], geotransform[1] )
+			data["tl"] = ( geotransform[3], geotransform[0] )
+			data["tr"] = ( geotransform[3], geotransform[0] + ( geotransform[1] * dataset.RasterXSize )  )
+			data["bl"] = ( geotransform[3] + ( geotransform[5] * dataset.RasterYSize ), geotransform[0] )
+			data["br"] = ( data["bl"][0], data["tr"][1] )
+			data["xdim"] = dataset.RasterXSize
+			data["ydim"] = dataset.RasterYSize
+			return data
+		else:
+			return { "error" : "ModelTiePoint not in lat/lon coordinates"}
 	else:
-		return None
+		return { "error" : "Unexpected EXIF tag setup" }
 
 # For labeling waypoints in left widget, given image coords from a click return the USNG coordinates
 #tl -> [ lat, long ], pxscale -> [ xscale, yscale ]
