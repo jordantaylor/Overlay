@@ -179,6 +179,11 @@ class OverlayWidget(QWidget):
 				line.hide()
 			else:
 				line.show()
+		for label in self.viewer.gridlabels:
+			if label.isVisible():
+				label.hide()
+			else:
+				label.show()
 
 #### Slots ##############################################################################
 

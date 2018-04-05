@@ -135,7 +135,7 @@ class QtImageViewer(QGraphicsView):
         self.save_png_signal.emit()
 
     def create_grid(self):
-        lines = compute_gridlines( self.gps_points )
+        lines, labels = compute_gridlines( self.gps_points )
         # 1000m gridline pen
         major = QPen()
         major.setWidth(2)
@@ -148,17 +148,44 @@ class QtImageViewer(QGraphicsView):
         minor.setBrush(Qt.red)
         minor.setStyle(Qt.DashLine)
         self.minorgrid = []
+        self.gridlabels = []
         # If there was an error, raise error window, put message in it, and OK takes back to MainWidget.
         if not lines[0]: #lines[0][0] will be None if there is an error, and lines[0][1] has the message.
             errmsg = lines[1]
             raise ValueError("create_grid failed for some reason")
-        for direction in lines:
-            for line in direction:
+        # for direction in lines:
+        for i in range( 0, len(lines) ):
+            for j in range( 0, len(lines[i]) ):
+            # for line in direction:
+                line = lines[i][j]
+                label = labels[i][j]
+                # Create QGraphicsSimpleTextItem for each side of the line and place it
+                grid_label = QGraphicsTextItem( str(label) )
                 if line[1]:
-                   self.scene.addLine( line[0], major )
+                    grid_label.setScale(75)
+                else:
+                    grid_label.setScale(50)
+
+                bounding = grid_label.mapRectToScene(grid_label.boundingRect())
+                width = bounding.width()/2
+                height = bounding.height()/2
+                print( "height:", height )
+                print( "width:", width )
+                
+                # if i is 0 this is a vertical line
+                if i == 0:
+                    grid_label.setPos( line[0].p1().x() - width, line[0].p1().y() - 1.75*height )
+                # else this is a horizontal line
+                else:
+                    grid_label.setPos( line[0].p1().x() - 1.75*width, line[0].p1().y() - height)
+
+                self.scene.addItem(grid_label)
+                if line[1]:
+                    self.scene.addLine( line[0], major )
                 else:
                     cur = self.scene.addLine( line[0], minor )
                     self.minorgrid.append(cur)
+                    self.gridlabels.append(grid_label)
 
     # 'zoom_in' handles the zooming of the image and the related scaling of the waypoints
     def zoom_in(self):

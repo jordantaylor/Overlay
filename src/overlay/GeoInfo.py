@@ -38,6 +38,7 @@ def compute_gridlines( data ):
 	north = round( int(cur_usng[3]) - 50, -2 )
 
 	lines = [ [], [] ]
+	labels = [ [], [] ]
 	for i in range(0,10):
 	# Compute USNG coords of next (south east) grid intersection
 
@@ -62,10 +63,19 @@ def compute_gridlines( data ):
 			y_span = abs(int( (tl[0] - next_cross[0]) / pixelscale[0] ))
 
 			if east < int(br_usng[2]):
-				lines[0].append( [QLineF(x_span, 0, x_span, ydim), (east % 1000 == 0) ]) #True -> 1000m gridline, False -> 100m gridline
+				#True -> 1000m gridline, False -> 100m gridline
+				lines[0].append( [QLineF(x_span, 0, x_span, ydim), (east % 1000 == 0) ])
+				#Add the gridline number this line has 
+				if east % 1000 == 0:
+					labels[0].append( east//1000 )
+				else:
+					labels[0].append( east//100 )
 			if north > int(br_usng[3]):
-				#lines.append( [QLineF(y_span, 0, y_span, ydim), (north % 1000 == 0) ])
 				lines[1].append( [QLineF(0, y_span, xdim, y_span), (north % 1000 == 0) ] )
+				if north % 1000 == 0:
+					labels[1].append( north//1000 )
+				else:
+					labels[1].append( north//100 )
 
 			# Update cur_usng to the just found grid intersection
 			cur_usng = cross_usng.split()
@@ -74,7 +84,7 @@ def compute_gridlines( data ):
 		else:
 			break
 
-	return lines
+	return lines, labels
 
 def get_points( filename ):
 	dataset = gdal.Open(filename, gdal.GA_ReadOnly)
