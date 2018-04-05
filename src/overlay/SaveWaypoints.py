@@ -1,47 +1,56 @@
 import os
 
-#by calling build entry you add a file to 
+#by calling build entry you add a file to the folder saves
 
 def buildEntry(name, pointArray):
-	#entry = str(index) + "," + str(x) + ","+ str(y)
-	curpath = os.path.dirname(__file__)
 
-        #strip name out of filepath
-        while "\\" in name:
-            index = name.find("\\") 
-            name = name[index:]
-        name = name[:-4]
-        print("Saving waypoints to %s" % name)
+    #windows
+    savepath = ("..\\..\\saves")
+    
+    #unix
+    #savepath = ("../../saves")
 
 
-        entry = ""
 
-        path = '\\waypoints' + name
-        newpath = os.path.relpath(name + "_waypoints.txt")
+    #strip name out of filepath
+    while "\\" in name:
+        index = name.find("\\") 
+        name = name[index:]
+    name = name[:-4]
+    print("Saving waypoints to %s_waypoints.txt" % name)
 
-	#createfile(entry, name)
-        #put into way points folder
-	filename = name + "_waypoints.txt"
-	f = open(filename, "w+")
+
+    entry = ""
+    newFile = os.path.join(savepath, name + "_waypoints.txt")
+
+    f = open(newFile, "w+")
 
         #loop to insert entries
-        for point in pointArray:
-            #x data
-            xdata = str(point.x)
-            #y data
-            ydata = str(point.y)
+    for point in pointArray:
 
-            newEntry = xdata + "," + ydata
-            
-            f.write("%s\n" % newEntry)
-        f.close()
+        #x data
+        xdata = str(point.x)
+        #y data
+        ydata = str(point.y)
+        
+        newEntry = xdata + "," + ydata
+        
+
+        #test function 
+        #newEntry = point
+
+        f.write("%s\n" % newEntry)
+    f.close()
 
 
-	#f.write("%s\n" % entry)
-	#f.close()
 
-#def removeEntry(name, index):
- #   filename = name + "_waypoints.txt"
-	
-	
-#buildEntry("test2", "b", 10, 33)
+#test function
+"""
+testName = input("filename: ")
+
+testArray = input("array: ")
+
+buildEntry(testName, testArray)
+"""
+
+

@@ -232,4 +232,48 @@ class OverlayWidget(QWidget):
 		else:
 			self.del_hide_waypoint(_key)
 
-#########################################################################################
+#####Save Waypoints##############################################################################
+def buildEntry(self):
+
+    pointArray = self.waypoints
+    name = self.viewer.path_name
+
+    #windows
+    savepath = ("..\\..\\saves")
+    
+    #unix
+    #savepath = ("../../saves")
+
+
+
+    #strip name out of filepath
+    while "\\" in name:
+        index = name.find("\\") 
+        name = name[index:]
+    name = name[:-4]
+    print("Saving waypoints to %s_waypoints.txt" % name)
+
+
+    entry = ""
+    newFile = os.path.join(savepath, name + "_waypoints.txt")
+
+    f = open(newFile, "w+")
+    f.write("%s\n" % name)
+        #loop to insert entries
+    for point in pointArray:
+
+        #x data
+        xdata = str(point.x)
+        #y data
+        ydata = str(point.y)
+        
+        newEntry = xdata + "," + ydata
+        
+
+        #test function 
+        #newEntry = point
+
+        f.write("%s\n" % newEntry)
+    f.close()
+
+
