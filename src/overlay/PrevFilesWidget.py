@@ -32,13 +32,13 @@ class PrevFilesWidget(QWidget):
 		self.itemvlist = QVBoxLayout()
 		self.tiflist = {}
 
-		dirlist = os.listdir("../../TIF_Files")
+		dirlist = os.listdir("../../saves")
 		for item in dirlist: 
 			if item[0] != '.':
 				if item[len(item)-4:len(item)] == ".tif":
 					itemhlist = QHBoxLayout()
 					itembtn = QPushButton(item[0:len(item)-4],self)
-					itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked("../../TIF_Files/"+item))
+					itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked("../../saves/"+item))
 					itemhlist.addWidget(itembtn)
 					self.tiflist[item] = itembtn
 					self.itemvlist.addLayout(itemhlist)
