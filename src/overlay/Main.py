@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from StackWidget import StackWidget
+from SaveWaypoints import buildEntry
 
 class Overlay(QMainWindow):
 	def __init__(self):
@@ -58,6 +59,7 @@ class Overlay(QMainWindow):
 		loadAct.triggered.connect(self.wid.page1.on_prevfiles_clicked)
 		exportPngAct = QAction('Export Overlay to PNG [TODO]', self)
 		saveWayptsAct = QAction('Save Waypoints to File [TODO]', self)
+                saveWayptsAct.triggered.connect(buildEntry())
 		exitAct = QAction('Exit Program', self)
 		exitAct.triggered.connect(QApplication.instance().quit)
 		fileMenu.addAction(openAct)
