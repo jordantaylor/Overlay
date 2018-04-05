@@ -258,7 +258,7 @@ def buildEntry(self):
     newFile = os.path.join(savepath, name + "_waypoints.txt")
 
     f = open(newFile, "w+")
-
+    f.write("%s\n" % name)
         #loop to insert entries
     for point in pointArray:
 
