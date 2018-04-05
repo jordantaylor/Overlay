@@ -38,6 +38,9 @@ class OverlayWidget(QWidget):
 		self.whyyyy = QVBoxLayout()
 		self.whyyyy.addLayout(self.navlayout)
 		self.whyyyy.addLayout(self.mainlayout)
+
+		self.viewer.save_png_signal.connect(self.save_png)
+
 		self.setLayout(self.whyyyy)
 
 	def initLoadingWindow(self):
@@ -180,6 +183,15 @@ class OverlayWidget(QWidget):
 #### Slots ##############################################################################
 
 	@pyqtSlot()
+	def save_png(self):
+		print("save_png slot active")
+		fileName, ignore = QFileDialog.getSaveFileName(self, 'Save image', QCoreApplication.applicationDirPath(), 'PNG (*.png)')
+		if fileName:
+			print(fileName)
+			pixmap = self.grab()
+			pixmap.save(fileName)
+
+	@pyqtSlot()
 	def on_start_clicked(self):
 		self.changeWidgetSignal.emit(0)
 
@@ -187,14 +199,14 @@ class OverlayWidget(QWidget):
 	def on_load_clicked(self):
 		self.changeWidgetSignal.emit(2)
 
-	# this slot is called after user selects a filename to load from an open tif button
+	# this slot is called after user selects a fileName to load from an open tif button
 	@pyqtSlot(str)
-	def on_load_signal(self,filename):
+	def on_load_signal(self,fileName):
 		self.initLoadingWindow()
 		self.loading_screen.show()
 
 		try:
-			self.viewer.set_image(filename)
+			self.viewer.set_image(fileName)
 			self.viewer.gps_points = get_points(self.viewer.image_path)
 			self.loading_screen.hide()
 			if "error" in self.viewer.gps_points:

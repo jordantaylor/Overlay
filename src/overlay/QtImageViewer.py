@@ -10,6 +10,9 @@ class QtImageViewer(QGraphicsView):
     # 'add_delete_waypoint_signal' is used to communicate with the class 'OverlayWidget'
     add_delete_waypoint_signal = pyqtSignal(int, str, int, int)
 
+    # this signal is caught by the overlaywidget where the png is created and saved
+    save_png_signal = pyqtSignal()
+
 #### Initialization Functions ###########################################################
 
     def __init__(self):
@@ -129,15 +132,7 @@ class QtImageViewer(QGraphicsView):
 
 
     def download_png_press(self):
-        ignore, fileName = QFileDialog.getSaveFileName(self, 'Save image', QCoreApplication.applicationDirPath(), 'PNG (*.png)')
-        if fileName:
-            self.image = QImage(self.scene.sceneRect().size().toSize(), QImage.Format_ARGB32)
-            self.image.fill(Qt.transparent)
-            self.painter = QPainter(self.image)
-            self.painter.setRenderHints(QPainter.Antialiasing)
-            self.scene.render(self.painter)
-            self.painter.end()
-            self.image.save(fileName)
+        self.save_png_signal.emit()
 
     def create_grid(self):
         lines = compute_gridlines( self.gps_points )
