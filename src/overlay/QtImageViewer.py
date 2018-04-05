@@ -223,18 +223,25 @@ class QtImageViewer(QGraphicsView):
             del self.waypoints[_key]
 
     # 'add_waypoint' adds a waypoint to the image if there are less than 26 on screen
-    def add_waypoint(self, x, y):
+    def add_waypoint(self, x, y, shift=True):
         if self.key_array:
             _key = self.key_array.pop()
             _alpha_pin_path = '../../assets/pins/pin_' + _key + '.png'
             self.waypoint_icon = QPixmap(os.path.join(self.cur_path, _alpha_pin_path))
             self.waypoint = QGraphicsPixmapItem(self.waypoint_icon)
             self.waypoint.setTransformOriginPoint(self.waypoint_icon.width() / 2, self.waypoint_icon.height())
-            self.waypoint.setPos(x - (self.waypoint_icon.width() / 2), y - self.waypoint_icon.height())
+            if shift:
+                self.waypoint.setPos(x - (self.waypoint_icon.width() / 2), y - self.waypoint_icon.height())
+            else:
+                self.waypoint.setPos(x,y)
             self.waypoint.setScale(self.wpt_cur_scale)
             self.scene.addItem(self.waypoint)
             self.waypoints[_key] = self.waypoint
-            self.add_delete_waypoint_signal.emit(1, _key, x - (self.waypoint_icon.width() / 2), y - self.waypoint_icon.height())
+            if shift:
+                self.add_delete_waypoint_signal.emit( 1, _key, x - (self.waypoint_icon.width() / 2), y - self.waypoint_icon.height())
+            else:
+                self.add_delete_waypoint_signal.emit( 1, _key, x, y )
+
 
     ###################################
     # Button press functions
