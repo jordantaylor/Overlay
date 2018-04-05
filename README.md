@@ -1,14 +1,13 @@
 # overlay
 
 Functionality left to be implemented:
-- Save overlay to png, save at current zoom level (kevin/jordan)
 - Save files for waypoints, save file button (andres)
 - Page for loading tifs with saved waypoints (harrison)
-- Display useful error instead of crash on loading tif without gps (jordan)
+- grid line numbering for minor and major grid lines (jordan)
 - pyinstaller, how to handle installing python first, script to install gdal (andres)
 - improve ui aesthetics
 - any error checking that can be conceived of
-- verification of the computed gridlines within margins of error
+- verification of the computed gridlines within margins of error (jordan)
 
 pyqt5 python application for rendering an overlay for an uploaded .tif orthomosaic with google maps like controls
 
