@@ -10,6 +10,7 @@ from GeoInfo import *
 class OverlayWidget(QWidget):
 
 	changeWidgetSignal = pyqtSignal(int)
+	load_error_signal = pyqtSignal(str)
 
 	def __init__(self):
 		super().__init__()
@@ -22,18 +23,10 @@ class OverlayWidget(QWidget):
 		self.initWayptList()
 		self.initLoadingWindow()
 
-		# Temporary buttons for development use
-		self.start_btn = QPushButton("<-- Back [temporary]",self)
-		self.load_btn = QPushButton("To Loadpage [temporary]",self)
-		self.start_btn.clicked.connect(self.on_start_clicked)
-		self.load_btn.clicked.connect(self.on_load_clicked)
-
 		self.viewer = QtImageViewer()
 		self.make_connection(self.viewer)
 
 		self.navlayout = QHBoxLayout()
-		self.navlayout.addWidget(self.start_btn)
-		self.navlayout.addWidget(self.load_btn)
 
 		self.subgridlayout = QGridLayout()
 		self.subgridlayout.addWidget(self.viewer,0,0,10,10)
@@ -172,10 +165,17 @@ class OverlayWidget(QWidget):
 				self.waypts_sublayout.addWidget(x)
 
 	def hide_sidebar(self):
-		if self.waypts.isVisible():
-			self.waypts.hide()
+		if self.scrollarea.isVisible():
+			self.scrollarea.hide()
 		else:
-			self.waypts.show()
+			self.scrollarea.show()
+
+	def hide_100m_grid(self):
+		for line in self.viewer.minorgrid:
+			if line.isVisible():
+				line.hide()
+			else:
+				line.show()
 
 #### Slots ##############################################################################
 
@@ -193,12 +193,18 @@ class OverlayWidget(QWidget):
 		self.initLoadingWindow()
 		self.loading_screen.show()
 
-		self.viewer.set_image(filename)
-		self.viewer.gps_points = get_points(self.viewer.image_path)
-
-		self.loading_screen.hide()
-
-		self.changeWidgetSignal.emit(1)
+		try:
+			self.viewer.set_image(filename)
+			self.viewer.gps_points = get_points(self.viewer.image_path)
+			self.loading_screen.hide()
+			if "error" in self.viewer.gps_points:
+				self.load_error_signal.emit( self.viewer.gps_points["error"] )
+			else:
+				self.changeWidgetSignal.emit(1)
+		except ValueError as e:
+			self.loading_screen.hide()
+			self.load_error_signal.emit( "internal usng error encountered" )
+			
 
 	# this slot is called when a signal is passed from the QtImageViewer class
 	@pyqtSlot(int, str, int, int)
