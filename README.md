@@ -3,7 +3,6 @@
 Functionality left to be implemented:
 - Save files for waypoints, save file button (andres)
 - Page for loading tifs with saved waypoints (harrison)
-- grid line numbering for minor and major grid lines (jordan)
 - pyinstaller, how to handle installing python first, script to install gdal (andres)
 - improve ui aesthetics
 - any error checking that can be conceived of
