@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from StackWidget import StackWidget
-from SaveWaypoints import buildEntry
+from OverlayWidget import OverlayWidget
 
 class Overlay(QMainWindow):
 	def __init__(self):
@@ -28,6 +28,7 @@ class Overlay(QMainWindow):
 		self.wid.page2.changeWidgetSignal.connect(self.switchWidget)
 		self.wid.page3.changeWidgetSignal.connect(self.switchWidget)
 		self.wid.page1.selectTifSignal.connect(self.wid.page2.on_load_signal)
+		self.wid.page3.selectTifSignal.connect(self.wid.page2.on_load_signal)
 		# Slot to receive tif loading error and handle it
 		self.wid.page2.load_error_signal.connect(self.handleFileError)
 
@@ -59,7 +60,7 @@ class Overlay(QMainWindow):
 		loadAct.triggered.connect(self.wid.page1.on_prevfiles_clicked)
 		exportPngAct = QAction('Export Overlay to PNG [TODO]', self)
 		saveWayptsAct = QAction('Save Waypoints to File [TODO]', self)
-		saveWayptsAct.triggered.connect(buildEntry())
+		#saveWayptsAct.triggered.connect(OverlayWidget.buildEntry(self))
 		exitAct = QAction('Exit Program', self)
 		exitAct.triggered.connect(QApplication.instance().quit)
 		fileMenu.addAction(openAct)

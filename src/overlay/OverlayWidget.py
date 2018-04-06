@@ -140,7 +140,7 @@ class OverlayWidget(QWidget):
 			index = ord(_key) - ord('0') + 26
 		else:
 			index = ord(_key) - ord('A')
-			
+
 		self.waypoint_widgets[index].hide()
 		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
 		self.viewer.delete_waypoint(_key)
@@ -221,7 +221,7 @@ class OverlayWidget(QWidget):
 		except ValueError as e:
 			self.loading_screen.hide()
 			self.load_error_signal.emit( "internal usng error encountered" )
-			
+
 
 	# this slot is called when a signal is passed from the QtImageViewer class
 	@pyqtSlot(int, str, int, int)
@@ -233,47 +233,46 @@ class OverlayWidget(QWidget):
 			self.del_hide_waypoint(_key)
 
 #####Save Waypoints##############################################################################
-def buildEntry(self):
-
-    pointArray = self.waypoints
-    name = self.viewer.path_name
-
-    #windows
-    savepath = ("..\\..\\saves")
-    
-    #unix
-    #savepath = ("../../saves")
+	def buildEntry(self):
 
 
+		print(self)
+		pointArray = [1,2,3,4]
+		name = "test"
 
-    #strip name out of filepath
-    while "\\" in name:
-        index = name.find("\\") 
-        name = name[index:]
-    name = name[:-4]
-    print("Saving waypoints to %s_waypoints.txt" % name)
+	    #windows
+		#savepath = ("..\\..\\saves")
 
-
-    entry = ""
-    newFile = os.path.join(savepath, name + "_waypoints.txt")
-
-    f = open(newFile, "w+")
-    f.write("%s\n" % name)
-        #loop to insert entries
-    for point in pointArray:
-
-        #x data
-        xdata = str(point.x)
-        #y data
-        ydata = str(point.y)
-        
-        newEntry = xdata + "," + ydata
-        
-
-        #test function 
-        #newEntry = point
-
-        f.write("%s\n" % newEntry)
-    f.close()
+	    #unix
+		savepath = ("../../saves")
 
 
+
+	    #strip name out of filepath
+		while "\\" in name:
+			index = name.find("\\")
+			name = name[index:]
+		name = name[:-4]
+		print("Saving waypoints to %s_waypoints.txt" % name)
+
+
+		entry = ""
+		newFile = os.path.join(savepath, name + "_waypoints.txt")
+
+		f = open(newFile, "w+")
+		f.write("%s\n" % name)
+	        #loop to insert entries
+		for point in pointArray:
+
+	        #x data
+			xdata = 1#str(point.x)
+	        #y data
+			ydata = 1#str(point.y)
+
+			newEntry = str(xdata) + "," + str(ydata)
+
+
+	        #test function
+	        #newEntry = point
+			f.write("%s\n" % newEntry)
+		f.close()
