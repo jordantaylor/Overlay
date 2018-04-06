@@ -8,9 +8,9 @@ from SaveWaypoints import buildEntry
 class Overlay(QMainWindow):
 	def __init__(self):
 		super().__init__()
-		
+
 		self.initUI()
-		
+
 #### Initialization Functions ###########################################################
 
 	def initUI(self):
@@ -18,7 +18,7 @@ class Overlay(QMainWindow):
 		self.setWindowTitle('USNG Overlay - Start')
 
 		# TODO make platform independent
-		self.setWindowIcon(QIcon('..\\..\\assets\\gimp_pepper.png')) 
+		self.setWindowIcon(QIcon('..\\..\\assets\\gimp_pepper.png'))
 
 		self.wid = StackWidget()
 		self.setCentralWidget(self.wid)
@@ -51,7 +51,7 @@ class Overlay(QMainWindow):
 		self.menubar = self.menuBar()
 		fileMenu = self.menubar.addMenu('File')
 		viewMenu = self.menubar.addMenu('View')
-		
+
 		# Create the file actions and add them
 		openAct = QAction('Open TIFF Image', self)
 		openAct.triggered.connect(self.wid.page1.on_opentif_clicked)
@@ -59,7 +59,7 @@ class Overlay(QMainWindow):
 		loadAct.triggered.connect(self.wid.page1.on_prevfiles_clicked)
 		exportPngAct = QAction('Export Overlay to PNG [TODO]', self)
 		saveWayptsAct = QAction('Save Waypoints to File [TODO]', self)
-                saveWayptsAct.triggered.connect(buildEntry())
+		saveWayptsAct.triggered.connect(buildEntry())
 		exitAct = QAction('Exit Program', self)
 		exitAct.triggered.connect(QApplication.instance().quit)
 		fileMenu.addAction(openAct)
@@ -110,9 +110,9 @@ class Overlay(QMainWindow):
 		self.wid.setCurrentIndex(0)
 
 #########################################################################################
-		
+
 if __name__ == '__main__':
-	
+
 	app = QApplication(sys.argv)
 	ex = Overlay()
 	sys.exit(app.exec_())
