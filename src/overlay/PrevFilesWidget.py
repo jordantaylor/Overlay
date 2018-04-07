@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy, QGridLayout
 from PyQt5.QtCore import QRect, pyqtSlot, pyqtSignal
+from QtImageViewer import QtImageViewer
 from pprint import pprint
 import os
 
@@ -32,23 +33,46 @@ class PrevFilesWidget(QWidget):
 		self.itemvlist = QVBoxLayout()
 		self.tiflist = {}
 
-		dirlist = os.listdir("../../TIF_Files")
-		for item in dirlist: 
+		dirlist = os.listdir("../../saves")
+		for item in dirlist:
+			#print(item)
 			if item[0] != '.':
-				if item[len(item)-4:len(item)] == ".tif":
+				if item[len(item)-4:len(item)] == ".txt":
 					itemhlist = QHBoxLayout()
 					itembtn = QPushButton(item[0:len(item)-4],self)
-					itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked("../../TIF_Files/"+item))
+					fline = open("../../saves/"+item).readline().rstrip()
+					itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked(fline))
 					itemhlist.addWidget(itembtn)
 					self.tiflist[item] = itembtn
 					self.itemvlist.addLayout(itemhlist)
+			item = None
 		self.setLayout(self.itemvlist)
-		
+
+	def getLocations(self):
+		coords = []
+		namedFile = ""
+		dirlist = os.listdir("../../saves")
+		for item in dirlist:
+			if item[0] != '.':
+				if item[len(item)-4:len(item)] == ".txt":
+					namedFile = "../../saves/"+item
+					lines = [line.rstrip('\n') for line in open(namedFile)]
+					fline = lines[0]
+					for i in range(1, len(lines)):
+						temp_string = lines[i]
+						loc = temp_string.find(',')
+						x = temp_string[:loc]
+						y = temp_string[loc+1:]
+						coords.append([item[:len(item)-4], x , y])
+		'''for item in dirlist:
+			namedFile = "../../saves/"+item
+			namedFile.close()'''
+		return coords
 
 	@pyqtSlot(str)
 	def item_button_clicked(self,itemName):
-		self.selectTifSignal.emit(itemName) 
-		
+		self.selectTifSignal.emit(itemName)
+
 	@pyqtSlot()
 	def on_back_clicked(self):
 		self.changeWidgetSignal.emit(0)

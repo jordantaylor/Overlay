@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 class MainWidget(QWidget):
 	changeWidgetSignal = pyqtSignal(int)
 	selectTifSignal = pyqtSignal(str)
-	
+
 	def __init__(self):
 		super().__init__()
 		self.initUI()
@@ -16,7 +16,7 @@ class MainWidget(QWidget):
 		self.layout.setAlignment(Qt.AlignCenter|Qt.AlignCenter)
 		self.initBtns()
 		self.setLayout(self.layout)
-	
+
 	def initBtns(self):
 		# OpenTiffBtn#
 		OpenTiffBtn = QPushButton('Open a TIFF file',self)
@@ -44,7 +44,7 @@ class MainWidget(QWidget):
 		fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","TIFF Files (*.tif)")
 		if fileName:
 			self.selectTifSignal.emit(fileName)
-		
+
 	@pyqtSlot()
 	def on_prevfiles_clicked(self):
 		self.changeWidgetSignal.emit(2)
