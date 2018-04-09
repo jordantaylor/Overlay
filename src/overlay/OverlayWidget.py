@@ -206,8 +206,8 @@ class OverlayWidget(QWidget):
 		self.changeWidgetSignal.emit(2)
 
 	# this slot is called after user selects a fileName to load from an open tif button
-	@pyqtSlot(str)
-	def on_load_signal(self,fileName):
+	@pyqtSlot(str,str)
+	def on_load_signal(self,fileName,origin):
 		self.initLoadingWindow()
 		self.loading_screen.show()
 
@@ -216,24 +216,23 @@ class OverlayWidget(QWidget):
 			self.viewer.gps_points = get_points(self.viewer.image_path)
 			self.loading_screen.hide()
 			temp_name = fileName
-			print(temp_name)
-			'''while "/" in temp_name:
-				index = temp_name.find("/")
-				temp_name = temp_name[index:]'''
-			for i in range (len(temp_name)-1, -1, -1):
-				if temp_name[i] == "/":
-					temp_name = temp_name[i+1:len(temp_name)-4]
-					break
-			print(temp_name)
-			#temp_name = temp_name[len(temp_name)-9:len(temp_name)-4]
-			coords = PrevFilesWidget().getLocations()
-			print(coords[0][0])
-			print(coords[0][1])
-			print(coords[0][2])
-			print(temp_name)
-			for i in range(0, len(coords)):
-				if coords[i][0] == temp_name:
-					self.viewer.add_waypoint(int(coords[i][1]), int(coords[i][2]), False)
+			# print(temp_name)
+			if origin == "prevfiles":
+				for i in range (len(temp_name)-1, -1, -1):
+					if temp_name[i] == "/":
+						temp_name = temp_name[i+1:len(temp_name)-4]
+						break
+				# print(temp_name)
+
+				coords = PrevFilesWidget().getLocations()
+				# print(coords[0][0])
+				# print(coords[0][1])
+				# print(coords[0][2])
+				# print(temp_name)
+				for i in range(0, len(coords)):
+					if coords[i][0] == temp_name:
+						self.viewer.add_waypoint(int(coords[i][1]), int(coords[i][2]), False)
+
 			if "error" in self.viewer.gps_points:
 				self.load_error_signal.emit( self.viewer.gps_points["error"] )
 			else:
