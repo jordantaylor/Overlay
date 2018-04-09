@@ -9,7 +9,7 @@ class PrevFilesWidget(QWidget):
 	# Widget seen when user selects load from previous file, in the end this
 	# should show TIFFs that have saved waypoints associated with them.
 	# - need to handle if original file is missing -> error OR move original
-	#   but we can't copy it because of size.
+	#	but we can't copy it because of size.
 	#
 	# Of lowest priority in meeting the customer's primary needs.
 	#
@@ -32,7 +32,9 @@ class PrevFilesWidget(QWidget):
 		self.itemvlist = QVBoxLayout()
 		self.tiflist = {}
 
-		dirlist = os.listdir("../../TIF_Files")
+		os.chdir( os.getcwd() )
+		os.chdir( "src/overlay/" )
+		dirlist = os.listdir("../../saves")
 		for item in dirlist: 
 			if item[0] != '.':
 				if item[len(item)-4:len(item)] == ".tif":

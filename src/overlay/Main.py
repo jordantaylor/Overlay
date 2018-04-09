@@ -37,14 +37,14 @@ class Overlay(QMainWindow):
 		self.showMaximized()
 
 	# def initErrorWindow(self):
-	# 	self.error_screen = QWidget()
-	# 	self.error_screen.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
-	# 	self.error_screen.frameGeometry().moveCenter(QDesktopWidget().availableGeometry().center())
-	# 	self.error_screen.setWindowTitle("Error")
-	# 	self.error_screen.resize(200, 50)
-	# 	self.error_layout = QVBoxLayout()
-	# 	self.error_layout.addWidget( QLabel("") )
-	# 	self.error_screen.setLayout(self.loading_layout)
+	#	self.error_screen = QWidget()
+	#	self.error_screen.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
+	#	self.error_screen.frameGeometry().moveCenter(QDesktopWidget().availableGeometry().center())
+	#	self.error_screen.setWindowTitle("Error")
+	#	self.error_screen.resize(200, 50)
+	#	self.error_layout = QVBoxLayout()
+	#	self.error_layout.addWidget( QLabel("") )
+	#	self.error_screen.setLayout(self.loading_layout)
 
 	def createMenuBar(self):
 		# Create a file menu for opening new file, exporting to image, & other file ops
@@ -59,7 +59,7 @@ class Overlay(QMainWindow):
 		loadAct.triggered.connect(self.wid.page1.on_prevfiles_clicked)
 		exportPngAct = QAction('Export Overlay to PNG [TODO]', self)
 		saveWayptsAct = QAction('Save Waypoints to File [TODO]', self)
-                saveWayptsAct.triggered.connect(buildEntry())
+		#saveWayptsAct.triggered.connect(buildEntry())
 		exitAct = QAction('Exit Program', self)
 		exitAct.triggered.connect(QApplication.instance().quit)
 		fileMenu.addAction(openAct)

@@ -39,7 +39,7 @@ def compute_gridlines( data ):
 
 	lines = [ [], [] ]
 	labels = [ [], [] ]
-	for i in range(0,10):
+	for i in range(0,500):
 	# Compute USNG coords of next (south east) grid intersection
 
 		# If either of the grid lines goes through the scene, we want to draw it
