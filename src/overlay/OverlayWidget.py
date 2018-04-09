@@ -87,10 +87,10 @@ class OverlayWidget(QWidget):
 			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
 			self.waypts_widget_label = QLabel()
 			if x > 25:
-				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('0') + x - 26) + '.png')
+				self.waypts_icon = QIcon('../../assets/pins/pin_' + chr(ord('0') + x - 26) + '.png')
 				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 			else:
-				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('A') + x) + '.png')
+				self.waypts_icon = QIcon('../../assets/pins/pin_' + chr(ord('A') + x) + '.png')
 				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 
 			# this label is left empty until set with a waypoint's coordinates when it is placed
@@ -261,11 +261,12 @@ class OverlayWidget(QWidget):
 		fullname = self.viewer.image_path
 
 	    #windows
-		#savepath = ("..\\..\\saves")
+		#savepath = ("../../saves")
 
 	    #unix
 		savepath = ("../../saves")
-		os.chdir(savepath)
+
+		#os.chdir(savepath)
 		print(savepath)
 
 
@@ -280,18 +281,18 @@ class OverlayWidget(QWidget):
 
 
 		entry = ""
-		newFile = os.getcwd()+ name + "_waypoints.txt"
+		newFile = "../../saves"+ name + "_waypoints.txt"
 		print(newFile)
 
-		f = open(newFile, "w+")
+		f = open( newFile, "w+")
 		f.write("%s\n" % fullname)
 	        #loop to insert entries
-		for point in pointArray:
-			
+		for key,val in self.viewer.waypoints.items():
+			print (val.x())
 	        #x data
-			xdata = point.x()
+			xdata = val.x()
 	        #y data
-			ydata = point.y()
+			ydata = val.y()
 
 			newEntry = str(xdata) + "," + str(ydata)
 

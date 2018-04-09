@@ -11,7 +11,7 @@ class PrevFilesWidget(QWidget):
 	selectTifSignal = pyqtSignal(str,str)
 	def __init__(self):
 		super().__init__()
-		self.savespath = 'saves'
+		self.savespath = '../../saves'
 		self.initUI()
 
 	def initUI(self):

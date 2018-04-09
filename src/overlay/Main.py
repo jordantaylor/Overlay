@@ -60,7 +60,7 @@ class Overlay(QMainWindow):
 		loadAct.triggered.connect(self.wid.page1.on_prevfiles_clicked)
 		exportPngAct = QAction('Export Overlay to PNG [TODO]', self)
 		saveWayptsAct = QAction('Save Waypoints to File [TODO]', self)
-		#saveWayptsAct.triggered.connect(OverlayWidget.buildEntry(self))
+		saveWayptsAct.triggered.connect(self.wid.page2.buildEntry)
 		exitAct = QAction('Exit Program', self)
 		exitAct.triggered.connect(QApplication.instance().quit)
 		fileMenu.addAction(openAct)
