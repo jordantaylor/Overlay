@@ -253,41 +253,46 @@ class OverlayWidget(QWidget):
 			self.del_hide_waypoint(_key)
 
 #####Save Waypoints##############################################################################
+	@pyqtSlot()
 	def buildEntry(self):
 
 
-		print(self)
-		pointArray = [1,2,3,4]
-		name = "test"
+		print("creating save data")
+		pointArray = self.viewer.waypoints
+		fullname = self.viewer.image_path
 
 	    #windows
 		#savepath = ("..\\..\\saves")
 
 	    #unix
 		savepath = ("../../saves")
+		os.chdir(savepath)
+		print(savepath)
 
 
 
 	    #strip name out of filepath
-		while "\\" in name:
-			index = name.find("\\")
-			name = name[index:]
+		#while "/" in name:
+		index = fullname.rfind("/")
+		name = fullname[index:]
+		print(name)
 		name = name[:-4]
 		print("Saving waypoints to %s_waypoints.txt" % name)
 
 
 		entry = ""
-		newFile = os.path.join(savepath, name + "_waypoints.txt")
+		newFile = os.getcwd()+ name + "_waypoints.txt"
+		print(newFile)
 
 		f = open(newFile, "w+")
-		f.write("%s\n" % name)
+		f.write("%s\n" % fullname)
 	        #loop to insert entries
 		for point in pointArray:
-
+			
 	        #x data
-			xdata = 1#str(point.x)
+			xdata = point.x()
 	        #y data
-			ydata = 1#str(point.y)
+			ydata = point.y()
 
 			newEntry = str(xdata) + "," + str(ydata)
 
