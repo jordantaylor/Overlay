@@ -20,6 +20,7 @@ class PrevFilesWidget(QWidget):
 	selectTifSignal = pyqtSignal(str)
 	def __init__(self):
 		super().__init__()
+                self.savespath = 'saves'
 		self.initUI()
 	def initUI(self):
 		self.l = QLabel("PrevFilesWidget")
@@ -33,14 +34,14 @@ class PrevFilesWidget(QWidget):
 		self.itemvlist = QVBoxLayout()
 		self.tiflist = {}
 
-		dirlist = os.listdir("../../saves")
+		dirlist = os.listdir( self.savespath )
 		for item in dirlist:
 			#print(item)
 			if item[0] != '.':
 				if item[len(item)-4:len(item)] == ".txt":
 					itemhlist = QHBoxLayout()
 					itembtn = QPushButton(item[0:len(item)-4],self)
-					fline = open("../../saves/"+item).readline().rstrip()
+					fline = open(self.savespath + "/" + item).readline().rstrip()
 					itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked(fline))
 					itemhlist.addWidget(itembtn)
 					self.tiflist[item] = itembtn
@@ -51,11 +52,11 @@ class PrevFilesWidget(QWidget):
 	def getLocations(self):
 		coords = []
 		namedFile = ""
-		dirlist = os.listdir("../../saves")
+		dirlist = os.listdir( self.savespath )
 		for item in dirlist:
 			if item[0] != '.':
 				if item[len(item)-4:len(item)] == ".txt":
-					namedFile = "../../saves/"+item
+					namedFile = self.savespath + "/" + item
 					lines = [line.rstrip('\n') for line in open(namedFile)]
 					fline = lines[0]
 					for i in range(1, len(lines)):
