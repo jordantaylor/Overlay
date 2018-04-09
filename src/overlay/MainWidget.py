@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 
 class MainWidget(QWidget):
 	changeWidgetSignal = pyqtSignal(int)
-	selectTifSignal = pyqtSignal(str)
+	selectTifSignal = pyqtSignal(str,str)
 
 	def __init__(self):
 		super().__init__()
@@ -43,7 +43,7 @@ class MainWidget(QWidget):
 		# when main tiff button clicked, first get a filename then
 		fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","TIFF Files (*.tif)")
 		if fileName:
-			self.selectTifSignal.emit(fileName)
+			self.selectTifSignal.emit(fileName,"overlay")
 
 	@pyqtSlot()
 	def on_prevfiles_clicked(self):
