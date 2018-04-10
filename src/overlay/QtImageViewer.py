@@ -263,7 +263,7 @@ class QtImageViewer(QGraphicsView):
     def expand_btn_press(self):
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
         self.zoom_level = self.zoom_min
-        self.wpt_cur_scale = self.wpt_max_scale
+        # self.wpt_cur_scale = self.wpt_max_scale
         if self.waypoints:
             for key, val in self.waypoints.items():
                 val.setScale(self.wpt_cur_scale)

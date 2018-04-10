@@ -93,6 +93,9 @@ class Overlay(QMainWindow):
 			#self.wid.page3.createLoadButtons()
 		self.wid.setCurrentIndex(widgetID)
 
+		if widgetID == 1:
+			self.wid.page2.viewer.expand_btn_press()
+
 	@pyqtSlot(str)
 	def handleFileError(self,errmsg):
 		# Set the error message in the error window and show it

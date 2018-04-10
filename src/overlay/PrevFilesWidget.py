@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButt
 from PyQt5.QtCore import QRect, pyqtSlot, pyqtSignal
 from QtImageViewer import QtImageViewer
 import os
+from functools import partial
 
 # This widget is responsible for rendering the page where waypoints can be loaded from save files.
 class PrevFilesWidget(QWidget):
@@ -37,8 +38,10 @@ class PrevFilesWidget(QWidget):
 					if item[-4:] == ".txt":
 						itemhlist = QHBoxLayout()
 						itembtn = QPushButton(item[:-4],self)
-						fline = open( os.fspath(self.savespath + "/" + item) ).readline().rstrip()
-						itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked(fline))
+						fline = None
+						with open( os.fspath(self.savespath + "/" + item) ) as f:
+							fline = f.readline().rstrip()
+						itembtn.clicked.connect( partial( self.item_button_clicked, fline ) )
 						itemhlist.addWidget(itembtn)
 						self.tiflist[item] = itembtn
 						self.itemvlist.addLayout(itemhlist)
