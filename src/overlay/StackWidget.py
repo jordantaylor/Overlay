@@ -7,6 +7,7 @@ class StackWidget(QWidget):
 	def __init__(self):
 		super().__init__()
 		self.initUI()
+
 	def initUI(self):
 		# Create one widget for each "page" of our application, 
 		# instancing that page's custom widget
@@ -20,9 +21,8 @@ class StackWidget(QWidget):
 		self.stackWidget.addWidget(self.page3)
 
 		vbox = QVBoxLayout(self)
-		# vbox.addWidget(self._list)
 		vbox.addWidget(self.stackWidget)
-
 		self.setLayout(vbox)
+
 	def setCurrentIndex( self, pagenum ):
 		self.stackWidget.setCurrentIndex(pagenum)

@@ -1,7 +1,4 @@
-import platform
 import os
-import subprocess
 
-
-subprocess.call("cd src\\overlay")
-subprocess.call("python3.6 Main.py")
+os.chdir( os.fspath("src/overlay") )
+os.system( "py -3 Main.py" )

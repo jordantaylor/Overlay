@@ -20,8 +20,6 @@ class QtImageViewer(QGraphicsView):
         self.cur_path = os.path.dirname(__file__)
 
         # important for upholding zoom max and min
-        # Note: May need to compute zoom limits based on distance viewable in viewport and pixelscale
-        # from geotif so size of image doesn't influence the zoom limits in real-world units
         self.zoom_level = 0
         self.zoom_max = 15
         self.zoom_min = 0
@@ -127,7 +125,6 @@ class QtImageViewer(QGraphicsView):
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
         self.gps_points = get_points(self.image_path)
         if not ("error" in self.gps_points):
-            print( self.gps_points )
             self.create_grid()
 
 
@@ -149,16 +146,13 @@ class QtImageViewer(QGraphicsView):
         minor.setStyle(Qt.DashLine)
         self.minorgrid = []
         self.gridlabels = []
-        # If there was an error, raise error window, put message in it, and OK takes back to MainWidget.
-        if not lines[0]: #lines[0][0] will be None if there is an error, and lines[0][1] has the message.
-            errmsg = lines[1]
-            raise ValueError("create_grid failed for some reason")
-        # for direction in lines:
+        # for each direction i in [ north, east ]
         for i in range( 0, len(lines) ):
+            # for each line j in direction i
             for j in range( 0, len(lines[i]) ):
-            # for line in direction:
                 line = lines[i][j]
                 label = labels[i][j]
+                
                 # Create QGraphicsSimpleTextItem for each side of the line and place it
                 grid_label = QGraphicsTextItem( str(label) )
                 if line[1]:
@@ -169,8 +163,6 @@ class QtImageViewer(QGraphicsView):
                 bounding = grid_label.mapRectToScene(grid_label.boundingRect())
                 width = bounding.width()/2
                 height = bounding.height()/2
-                print( "height:", height )
-                print( "width:", width )
                 
                 # if i is 0 this is a vertical line
                 if i == 0:

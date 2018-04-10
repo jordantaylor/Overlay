@@ -36,13 +36,13 @@ class OverlayWidget(QWidget):
 		self.mainlayout.addWidget(self.scrollarea, 1)
 		self.mainlayout.addLayout(self.subgridlayout, 5)
 
-		self.whyyyy = QVBoxLayout()
-		self.whyyyy.addLayout(self.navlayout)
-		self.whyyyy.addLayout(self.mainlayout)
+		self.layout = QVBoxLayout()
+		self.layout.addLayout(self.navlayout)
+		self.layout.addLayout(self.mainlayout)
 
 		self.viewer.save_png_signal.connect(self.save_png)
 
-		self.setLayout(self.whyyyy)
+		self.setLayout(self.layout)
 
 	def initLoadingWindow(self):
 		# the following code is for the loading_screen
@@ -53,7 +53,6 @@ class OverlayWidget(QWidget):
 		self.loading_screen.setWindowTitle("Loading...")
 		self.loading_screen.resize(200, 50)
 		self.loading_layout = QVBoxLayout()
-		self.loading_layout.addWidget( QLabel("LOADING!!!!") )
 		self.loading_screen.setLayout(self.loading_layout)
 
 	def initWayptList(self):
@@ -87,10 +86,10 @@ class OverlayWidget(QWidget):
 			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
 			self.waypts_widget_label = QLabel()
 			if x > 25:
-				self.waypts_icon = QIcon('../../assets/pins/pin_' + chr(ord('0') + x - 26) + '.png')
+				self.waypts_icon = QIcon( os.fspath('../../assets/pins/pin_' + chr(ord('0') + x - 26) + '.png') )
 				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 			else:
-				self.waypts_icon = QIcon('../../assets/pins/pin_' + chr(ord('A') + x) + '.png')
+				self.waypts_icon = QIcon( os.fspath('../../assets/pins/pin_' + chr(ord('A') + x) + '.png') )
 				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 
 			# this label is left empty until set with a waypoint's coordinates when it is placed
@@ -216,23 +215,16 @@ class OverlayWidget(QWidget):
 			self.viewer.gps_points = get_points(self.viewer.image_path)
 			self.loading_screen.hide()
 			temp_name = fileName
-			# print(temp_name)
 			if origin == "prevfiles":
 				for i in range (len(temp_name)-1, -1, -1):
 					if temp_name[i] == "/":
 						temp_name = temp_name[i+1:len(temp_name)-4]
 						break
-				# print(temp_name)
-
-				coords = PrevFilesWidget().getLocations()
-				# print(coords[0][0])
-				# print(coords[0][1])
-				# print(coords[0][2])
-				# print(temp_name)
+				#coords = PrevFilesWidget().getLocation()
+				coords = self.prevfileswidget.getLocation()
 				for i in range(0, len(coords)):
 					if coords[i][0] == temp_name:
 						self.viewer.add_waypoint(int(coords[i][1]), int(coords[i][2]), False)
-
 			if "error" in self.viewer.gps_points:
 				self.load_error_signal.emit( self.viewer.gps_points["error"] )
 			else:
@@ -251,53 +243,33 @@ class OverlayWidget(QWidget):
 		else:
 			self.del_hide_waypoint(_key)
 
-#####Save Waypoints##############################################################################
 	@pyqtSlot()
 	def buildEntry(self):
 
-
-		print("creating save data")
-		pointArray = self.viewer.waypoints
+		# full path of the loaded tif image
 		fullname = self.viewer.image_path
 
-	    #windows
-		#savepath = ("../../saves")
+		# path of save files relative to src/overlay (cwd when this is running)
+		savepath = os.fspath("../../saves")
 
-	    #unix
-		savepath = ("../../saves")
-
-		#os.chdir(savepath)
-		print(savepath)
-
-
-
-	    #strip name out of filepath
-		#while "/" in name:
-		index = fullname.rfind("/")
+	    # take the filename off of the full path to the loaded tif file
+		index = fullname.rfind( os.sep )
 		name = fullname[index:]
 		print(name)
 		name = name[:-4]
 		print("Saving waypoints to %s_waypoints.txt" % name)
 
-
 		entry = ""
-		newFile = "../../saves"+ name + "_waypoints.txt"
+		newFile = os.fspath( "../../saves"+ name + "_waypoints.txt" )
 		print(newFile)
 
+		# open the savefile for writing and insert the tif's path followed by
+		# the x,y scene coordinates of each active waypoint.
 		f = open( newFile, "w+")
 		f.write("%s\n" % fullname)
-	        #loop to insert entries
 		for key,val in self.viewer.waypoints.items():
-			print (val.x())
-	        #x data
 			xdata = val.x()
-	        #y data
 			ydata = val.y()
-
 			newEntry = str(xdata) + "," + str(ydata)
-
-
-	        #test function
-	        #newEntry = point
 			f.write("%s\n" % newEntry)
 		f.close()

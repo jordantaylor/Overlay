@@ -64,8 +64,8 @@
 #    for GoogleMaps application;  
 #    http://www.fidnet.com/~jlmoore/usng
 #
-#   Some functions corrected for python by Jordan Taylor, March 2018
-#   for USNG Overlay application
+#    Some functions corrected for python by Jordan Taylor, March 2018
+#    for USNG Overlay application
 #
 #    Assumes a datum of NAD83 (or its international equivalent WGS84). 
 #    If NAD27 is used, set IS_NAD83_DATUM to 'false'. (This does
@@ -644,7 +644,6 @@ def parseUSNG_str(usngStr_input):
     if len(usngStr) < 4:
         print( "This application requires minimum USNG precision of 10,000 meters")
         return None
-    # 15R TN  53713 69563
     parts = {}
     parts["zone"] = usngStr[0][:-1]
     parts["let"] = usngStr[0][-1]

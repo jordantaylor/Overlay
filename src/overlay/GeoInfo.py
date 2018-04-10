@@ -23,18 +23,12 @@ def compute_gridlines( data ):
 	# Using the top left USNG coordinate, to find grid intersections we want to find the pixels defined by
 	# a usng position of 2 decimal precision that lie within the image
 	# e.g. next grid intersection for 15R TN 53713 69563 would be at 15R TN 54 70
-	#"official" values are only for DMS02.tif for testing and future verification.
-	# print( "Top left :", tl_usng, "Tl official: 15R TN 53713 69563" )
-	# print( "Bot right:", br_usng, "Br official: 15R TN 54383 69148" )
 
 	cur_usng = tl_usng
-	# print( "cur_usng:", cur_usng )
 
 	# The grid line to our east has a higher value, ciel to next thousand
-	# east = round( int(cur_usng[2]) + 499, -3 )
 	east = round( int(cur_usng[2]) + 49, -2 )
 	# The grid line to our south has a lower value, floor to previous thousand
-	# north = round( int(cur_usng[3]) - 500, -3 )
 	north = round( int(cur_usng[3]) - 50, -2 )
 
 	lines = [ [], [] ]
@@ -46,17 +40,10 @@ def compute_gridlines( data ):
 		if (east < int(br_usng[2])) or (north > int(br_usng[3])):
 
 			cross_usng = cur_usng[0] + " " + cur_usng[1] + " " + str(east) + " " + str(north)
-			#print(cross_usng)
 			next_cross = USNGtoLL(cross_usng)
 			next_cross[0] = clamp(next_cross[0]) # latitude
 			next_cross[1] = clamp(next_cross[1]) # longitude
-			# print( "top_left gps:  ", clamp(tl[0]), clamp(tl[1]) )
 			tl = [ clamp(tl[0]), clamp(tl[1]) ]
-			# print( "next_cross gps:", next_cross[0], next_cross[1] )
-			# print( "x span gps:", tl[1] - next_cross[1] )
-			# print( "y:", next_cross[0] - tl[0] )
-			# print( "pixelscale lat: ", pixelscale[0] )
-			# print( "pixelscale long:", pixelscale[1] )
 
 			# get the image coordinates for that gps location using pixelscale
 			x_span = abs(int( (next_cross[1] - tl[1]) / pixelscale[1] ))

@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -14,14 +15,15 @@ class Overlay(QMainWindow):
 #### Initialization Functions ###########################################################
 
 	def initUI(self):
-		#self.setGeometry(135, 200, 800, 600)
 		self.setWindowTitle('USNG Overlay - Start')
 
-		# TODO make platform independent
-		self.setWindowIcon(QIcon('..\\..\\assets\\gimp_pepper.png'))
+		self.setWindowIcon( QIcon( os.fspath('../../assets/gimp_pepper.png') ) )
 
 		self.wid = StackWidget()
 		self.setCentralWidget(self.wid)
+
+		# Set class variable in overlaywidget to prevfileswidget instance
+		self.wid.page2.prevfileswidget = self.wid.page3
 
 		# Button signals
 		self.wid.page1.changeWidgetSignal.connect(self.switchWidget)
@@ -32,20 +34,9 @@ class Overlay(QMainWindow):
 		# Slot to receive tif loading error and handle it
 		self.wid.page2.load_error_signal.connect(self.handleFileError)
 
-		# self.initErrorWindow()
 		self.createMenuBar()
 		self.menubar.hide()
 		self.showMaximized()
-
-	# def initErrorWindow(self):
-	# 	self.error_screen = QWidget()
-	# 	self.error_screen.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
-	# 	self.error_screen.frameGeometry().moveCenter(QDesktopWidget().availableGeometry().center())
-	# 	self.error_screen.setWindowTitle("Error")
-	# 	self.error_screen.resize(200, 50)
-	# 	self.error_layout = QVBoxLayout()
-	# 	self.error_layout.addWidget( QLabel("") )
-	# 	self.error_screen.setLayout(self.loading_layout)
 
 	def createMenuBar(self):
 		# Create a file menu for opening new file, exporting to image, & other file ops
@@ -77,8 +68,6 @@ class Overlay(QMainWindow):
 		toggle100mGrid = QAction('Toggle 100 meter Grid Lines', self)
 		toggle100mGrid.triggered.connect(self.wid.page2.hide_100m_grid)
 		viewMenu.addAction(toggle100mGrid)
-
-#### Helper Functions ###################################################################
 
 	def center(self):
 		qr = self.frameGeometry()
