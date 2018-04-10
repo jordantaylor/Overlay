@@ -35,9 +35,9 @@ class PrevFilesWidget(QWidget):
 			dirlist = os.listdir( self.savespath )
 			for item in dirlist:
 				if item[0] != '.':
-					if item[len(item)-4:len(item)] == ".txt":
+					if item[-4:] == ".txt":
 						itemhlist = QHBoxLayout()
-						itembtn = QPushButton(item[0:len(item)-4],self)
+						itembtn = QPushButton(item[:-4],self)
 						fline = open( os.fspath(self.savespath + "/" + item) ).readline().rstrip()
 						itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked(fline))
 						itemhlist.addWidget(itembtn)
