@@ -4,8 +4,9 @@ from functools import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from QtImageViewer import QtImageViewer
+from QtImageViewer import *
 from GeoInfo import *
+from PrevFilesWidget import *
 
 class OverlayWidget(QWidget):
 
@@ -35,13 +36,13 @@ class OverlayWidget(QWidget):
 		self.mainlayout.addWidget(self.scrollarea, 1)
 		self.mainlayout.addLayout(self.subgridlayout, 5)
 
-		self.whyyyy = QVBoxLayout()
-		self.whyyyy.addLayout(self.navlayout)
-		self.whyyyy.addLayout(self.mainlayout)
+		self.layout = QVBoxLayout()
+		self.layout.addLayout(self.navlayout)
+		self.layout.addLayout(self.mainlayout)
 
 		self.viewer.save_png_signal.connect(self.save_png)
 
-		self.setLayout(self.whyyyy)
+		self.setLayout(self.layout)
 
 	def initLoadingWindow(self):
 		# the following code is for the loading_screen
@@ -52,7 +53,6 @@ class OverlayWidget(QWidget):
 		self.loading_screen.setWindowTitle("Loading...")
 		self.loading_screen.resize(200, 50)
 		self.loading_layout = QVBoxLayout()
-		self.loading_layout.addWidget( QLabel("LOADING!!!!") )
 		self.loading_screen.setLayout(self.loading_layout)
 
 	def initWayptList(self):
@@ -86,10 +86,10 @@ class OverlayWidget(QWidget):
 			# 'waypts_widget_label' will display the waypoint's key, a letter between 'A' and 'Z'
 			self.waypts_widget_label = QLabel()
 			if x > 25:
-				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('0') + x - 26) + '.png')
+				self.waypts_icon = QIcon( os.fspath('../../assets/pins/pin_' + chr(ord('0') + x - 26) + '.png') )
 				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 			else:
-				self.waypts_icon = QIcon('..\\..\\assets\\pins\\pin_' + chr(ord('A') + x) + '.png')
+				self.waypts_icon = QIcon( os.fspath('../../assets/pins/pin_' + chr(ord('A') + x) + '.png') )
 				self.waypts_widget_label.setPixmap( self.waypts_icon.pixmap(QSize(35,35)))
 
 			# this label is left empty until set with a waypoint's coordinates when it is placed
@@ -140,7 +140,7 @@ class OverlayWidget(QWidget):
 			index = ord(_key) - ord('0') + 26
 		else:
 			index = ord(_key) - ord('A')
-			
+
 		self.waypoint_widgets[index].hide()
 		self.waypts_layout.removeWidget(self.waypoint_widgets[index])
 		self.viewer.delete_waypoint(_key)
@@ -205,8 +205,8 @@ class OverlayWidget(QWidget):
 		self.changeWidgetSignal.emit(2)
 
 	# this slot is called after user selects a fileName to load from an open tif button
-	@pyqtSlot(str)
-	def on_load_signal(self,fileName):
+	@pyqtSlot(str,str)
+	def on_load_signal(self,fileName,origin):
 		self.initLoadingWindow()
 		self.loading_screen.show()
 
@@ -214,14 +214,26 @@ class OverlayWidget(QWidget):
 			self.viewer.set_image(fileName)
 			self.viewer.gps_points = get_points(self.viewer.image_path)
 			self.loading_screen.hide()
+			if origin == "prevfiles":
+				save_name = fileName[ fileName.rfind('/')+1:-4] + "_waypoints"
+
+				coords = self.prevfileswidget.getLocations( save_name )
+				if coords[0] == "error":
+					raise IOError( "File IO Error on save file. Save file likely missing." )
+				for i in range(0, len(coords)):
+					self.viewer.add_waypoint( int(coords[i][0]), int(coords[i][1]), False )
 			if "error" in self.viewer.gps_points:
-				self.load_error_signal.emit( self.viewer.gps_points["error"] )
+				raise ValueError( self.viewer.gps_points["error"] )
 			else:
 				self.changeWidgetSignal.emit(1)
-		except ValueError as e:
+		except (OSError, IOError, FileNotFoundError, ValueError) as e:
 			self.loading_screen.hide()
-			self.load_error_signal.emit( "internal usng error encountered" )
-			
+			msg = ''
+			if len(e.args) > 0:
+				msg = e.args[0]
+			else:
+				msg = repr(e)
+			self.load_error_signal.emit( msg )
 
 	# this slot is called when a signal is passed from the QtImageViewer class
 	@pyqtSlot(int, str, int, int)
@@ -232,48 +244,35 @@ class OverlayWidget(QWidget):
 		else:
 			self.del_hide_waypoint(_key)
 
-#####Save Waypoints##############################################################################
-def buildEntry(self):
+	@pyqtSlot()
+	def buildEntry(self):
 
-    pointArray = self.waypoints
-    name = self.viewer.path_name
+		# full path of the loaded tif image
+		tifPath = self.viewer.image_path
 
-    #windows
-    savepath = ("..\\..\\saves")
-    
-    #unix
-    #savepath = ("../../saves")
+		# path of save files relative to src/overlay (cwd when this is running)
+		savepath = os.fspath("../../saves")
 
+		# create saves folder if it doesn't exist
+		if not os.path.exists(savepath):
+			os.makedirs(savepath)
 
+	    # take the filename off of the full path to the loaded tif file
+		index = tifPath.rfind( '/' )
+		name = tifPath[index:]
+		name = name[:-4]
 
-    #strip name out of filepath
-    while "\\" in name:
-        index = name.find("\\") 
-        name = name[index:]
-    name = name[:-4]
-    print("Saving waypoints to %s_waypoints.txt" % name)
+		newFileName = name + "_waypoints.txt"
+		newFilePath = os.fspath( "../../saves" + newFileName )
+		print("Saving waypoints to %s" % newFileName)
 
-
-    entry = ""
-    newFile = os.path.join(savepath, name + "_waypoints.txt")
-
-    f = open(newFile, "w+")
-    f.write("%s\n" % name)
-        #loop to insert entries
-    for point in pointArray:
-
-        #x data
-        xdata = str(point.x)
-        #y data
-        ydata = str(point.y)
-        
-        newEntry = xdata + "," + ydata
-        
-
-        #test function 
-        #newEntry = point
-
-        f.write("%s\n" % newEntry)
-    f.close()
-
-
+		# open the savefile for writing and insert the tif's path followed by
+		# the x,y scene coordinates of each active waypoint.
+		f = open( newFilePath, "w+")
+		f.write("%s\n" % tifPath)
+		for key,val in self.viewer.waypoints.items():
+			xdata = int( round(val.x()) )
+			ydata = int( round(val.y()) )
+			newEntry = str(xdata) + "," + str(ydata)
+			f.write("%s\n" % newEntry)
+		f.close()
