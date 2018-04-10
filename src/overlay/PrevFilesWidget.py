@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy, QGridLayout
 from PyQt5.QtCore import QRect, pyqtSlot, pyqtSignal
 from QtImageViewer import QtImageViewer
-from pprint import pprint
 import os
 
 # This widget is responsible for rendering the page where waypoints can be loaded from save files.

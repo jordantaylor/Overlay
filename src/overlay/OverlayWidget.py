@@ -189,10 +189,8 @@ class OverlayWidget(QWidget):
 
 	@pyqtSlot()
 	def save_png(self):
-		print("save_png slot active")
 		fileName, ignore = QFileDialog.getSaveFileName(self, 'Save image', QCoreApplication.applicationDirPath(), 'PNG (*.png)')
 		if fileName:
-			print(fileName)
 			pixmap = self.grab()
 			pixmap.save(fileName)
 

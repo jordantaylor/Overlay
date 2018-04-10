@@ -50,6 +50,7 @@ class Overlay(QMainWindow):
 		loadAct = QAction('Load Saved TIFF File', self)
 		loadAct.triggered.connect(self.wid.page1.on_prevfiles_clicked)
 		exportPngAct = QAction('Export Overlay to PNG', self)
+		exportPngAct.triggered.connect(self.wid.page2.viewer.download_png_press)
 		saveWayptsAct = QAction('Save Waypoints to File', self)
 		saveWayptsAct.triggered.connect(self.wid.page2.buildEntry)
 		exitAct = QAction('Exit Program', self)
@@ -89,7 +90,7 @@ class Overlay(QMainWindow):
 			self.setWindowTitle("USNG Overlay - Load Saved Waypoints")
 			self.menubar.hide()
 		if widgetID == 2:
-			self.wid.page3.createLoadButtons()
+			#self.wid.page3.createLoadButtons()
 		self.wid.setCurrentIndex(widgetID)
 
 	@pyqtSlot(str)
