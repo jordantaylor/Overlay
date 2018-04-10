@@ -89,7 +89,7 @@ class Overlay(QMainWindow):
 		else:
 			self.setWindowTitle("USNG Overlay - Load Saved Waypoints")
 			self.menubar.hide()
-		if widgetID == 2:
+		# if widgetID == 2:
 			#self.wid.page3.createLoadButtons()
 		self.wid.setCurrentIndex(widgetID)
 
