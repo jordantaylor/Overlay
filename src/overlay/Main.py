@@ -17,7 +17,7 @@ class Overlay(QMainWindow):
 	def initUI(self):
 		self.setWindowTitle('USNG Overlay - Start')
 
-		self.setWindowIcon( QIcon( os.fspath('../../assets/gimp_pepper.png') ) )
+		self.setWindowIcon( QIcon( os.fspath('../../assets/usng-overlay.ico') ) )
 
 		self.wid = StackWidget()
 		self.setCentralWidget(self.wid)

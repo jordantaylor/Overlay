@@ -1,4 +1,4 @@
-from platform import architecture
+import platform
 from os import system
 
 ver = platform.architecture()[0]
