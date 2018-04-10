@@ -65,7 +65,7 @@ class QtImageViewer(QGraphicsView):
     def init_navbtns(self):
         zoom_in_btn = QPushButton()
         zoom_in_btn.setFixedSize(QSize(35, 35))
-        zoom_in_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/zoom_in.png')))
+        zoom_in_btn.setIcon( QIcon( os.fspath(os.path.join(self.cur_path, '../../assets/zoom_in.png') ) ) )
         zoom_in_btn.setIconSize(QSize(25, 25))
         zoom_in_btn.setToolTip("zoom in to image")
         zoom_in_btn.clicked.connect(self.zoom_in_btn_press)
@@ -73,7 +73,7 @@ class QtImageViewer(QGraphicsView):
 
         zoom_out_btn = QPushButton()
         zoom_out_btn.setFixedSize(QSize(35, 35))
-        zoom_out_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/zoom_out.png')))
+        zoom_out_btn.setIcon( QIcon( os.fspath(os.path.join(self.cur_path, '../../assets/zoom_out.png') ) ) )
         zoom_out_btn.setIconSize(QSize(25, 25))
         zoom_out_btn.setToolTip("zoom out of image")
         zoom_out_btn.clicked.connect(self.zoom_out_btn_press)
@@ -81,7 +81,7 @@ class QtImageViewer(QGraphicsView):
 
         expand_btn = QPushButton()
         expand_btn.setFixedSize(QSize(35, 35))
-        expand_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/expand.png')))
+        expand_btn.setIcon( QIcon( os.fspath( os.path.join(self.cur_path, '../../assets/expand.png') ) ) )
         expand_btn.setIconSize(QSize(25, 25))
         expand_btn.setToolTip("reset zoom level")
         expand_btn.clicked.connect(self.expand_btn_press)
@@ -89,7 +89,7 @@ class QtImageViewer(QGraphicsView):
 
         visibility_wpts_btn = QPushButton()
         visibility_wpts_btn.setFixedSize(QSize(35, 35))
-        visibility_wpts_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/visibility.png')))
+        visibility_wpts_btn.setIcon( QIcon( os.fspath(os.path.join(self.cur_path, '../../assets/visibility.png') ) ) )
         visibility_wpts_btn.setIconSize(QSize(25, 25))
         visibility_wpts_btn.setToolTip("hide/show all waypoints")
         visibility_wpts_btn.clicked.connect(self.visibility_wpts_btn_press)
@@ -97,7 +97,7 @@ class QtImageViewer(QGraphicsView):
 
         undo_wpt_btn = QPushButton()
         undo_wpt_btn.setFixedSize(QSize(35, 35))
-        undo_wpt_btn.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/undo.png')))
+        undo_wpt_btn.setIcon( QIcon( os.fspath(os.path.join(self.cur_path, '../../assets/undo.png') ) ) )
         undo_wpt_btn.setIconSize(QSize(25, 25))
         undo_wpt_btn.setToolTip("undo last added waypoint")
         undo_wpt_btn.clicked.connect(self.undo_wpt_btn_press)
@@ -105,7 +105,7 @@ class QtImageViewer(QGraphicsView):
 
         download_png = QPushButton()
         download_png.setFixedSize(QSize(35, 35))
-        download_png.setIcon(QIcon(os.path.join(self.cur_path, '../../assets/download.png')))
+        download_png.setIcon( QIcon( os.fspath( os.path.join(self.cur_path, '../../assets/download.png') ) ) )
         download_png.setIconSize(QSize(25, 25))
         download_png.setToolTip("download view as png")
         download_png.clicked.connect(self.download_png_press)
@@ -118,7 +118,10 @@ class QtImageViewer(QGraphicsView):
     # 'set_image' is called by 'OverlayWidget' to add the .tif image to the image viewer
     def set_image(self, str):
         self.image_path = str
-        self.pixmap = QPixmap(self.image_path)
+        try:
+            self.pixmap = QPixmap(self.image_path)
+        except (OSError, IOError, FileNotFoundError) as e:
+            raise IOError("Unable to load tif image. File not found or insufficient permissions to read.")
         self.scene = QGraphicsScene()
         self.scene.addPixmap(self.pixmap)
         self.setScene(self.scene)
@@ -152,7 +155,7 @@ class QtImageViewer(QGraphicsView):
             for j in range( 0, len(lines[i]) ):
                 line = lines[i][j]
                 label = labels[i][j]
-                
+
                 # Create QGraphicsSimpleTextItem for each side of the line and place it
                 grid_label = QGraphicsTextItem( str(label) )
                 if line[1]:

@@ -23,46 +23,47 @@ class PrevFilesWidget(QWidget):
 		self.btn.clicked.connect(self.on_back_clicked)
 
 		self.itemvlist = QVBoxLayout()
+		self.createLoadButtons()
+		self.setLayout(self.itemvlist)
+
+	def createLoadButtons(self):
 		self.tiflist = {}
 
 		# Go through the saves folder and make a button for each one for loading
 		# the tif along with its saved waypoints
-		dirlist = os.listdir( self.savespath )
-		for item in dirlist:
-			if item[0] != '.':
-				if item[len(item)-4:len(item)] == ".txt":
-					itemhlist = QHBoxLayout()
-					itembtn = QPushButton(item[0:len(item)-4],self)
-					fline = open( os.fspath(self.savespath + "/" + item) ).readline().rstrip()
-					itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked(fline))
-					itemhlist.addWidget(itembtn)
-					self.tiflist[item] = itembtn
-					self.itemvlist.addLayout(itemhlist)
-			item = None
-		self.setLayout(self.itemvlist)
+		if os.path.exists(self.savespath):
+			dirlist = os.listdir( self.savespath )
+			for item in dirlist:
+				if item[0] != '.':
+					if item[len(item)-4:len(item)] == ".txt":
+						itemhlist = QHBoxLayout()
+						itembtn = QPushButton(item[0:len(item)-4],self)
+						fline = open( os.fspath(self.savespath + "/" + item) ).readline().rstrip()
+						itembtn.clicked.connect(lambda *, item=item: self.item_button_clicked(fline))
+						itemhlist.addWidget(itembtn)
+						self.tiflist[item] = itembtn
+						self.itemvlist.addLayout(itemhlist)
 
-	#
-	def getLocations(self):
+	def getLocations(self, save_name):
 		coords = []
-		namedFile = ""
-		dirlist = os.listdir( self.savespath )
-		for item in dirlist:
-			if item[0] != '.':
-				if item[len(item)-4:len(item)] == ".txt":
-					namedFile = os.fspath( self.savespath + "/" + item )
-					lines = [line.rstrip('\n') for line in open(namedFile)]
-					fline = lines[0]
-					for i in range(1, len(lines)):
-						temp_string = lines[i]
-						loc = temp_string.find(',')
-						x = temp_string[:loc]
-						y = temp_string[loc+1:]
-						coords.append([item[:len(item)-4], x , y])
+		save_path = self.savespath + '/' + save_name + ".txt"
+		try:
+			with open( os.fspath(save_path) ) as save:
+				lines = [ line.rstrip('\n') for line in save ]
+				fline = lines[0]
+				for i in range(1, len(lines)):
+					line = lines[i]
+					comma = line.find(',')
+					x = line[:comma]
+					y = line[comma+1:]
+					coords.append( (x, y) )
+		except (OSError, IOError, FileNotFoundError) as e:
+			return [ "error" ]
 		return coords
 
 	@pyqtSlot(str)
 	def item_button_clicked(self,itemName):
-		self.selectTifSignal.emit(itemName)
+		self.selectTifSignal.emit(itemName, 'prevfiles')
 
 	# When the back button is clicked, go back to the MainWidget
 	@pyqtSlot()

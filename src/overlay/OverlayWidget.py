@@ -214,25 +214,26 @@ class OverlayWidget(QWidget):
 			self.viewer.set_image(fileName)
 			self.viewer.gps_points = get_points(self.viewer.image_path)
 			self.loading_screen.hide()
-			temp_name = fileName
 			if origin == "prevfiles":
-				for i in range (len(temp_name)-1, -1, -1):
-					if temp_name[i] == "/":
-						temp_name = temp_name[i+1:len(temp_name)-4]
-						break
-				#coords = PrevFilesWidget().getLocation()
-				coords = self.prevfileswidget.getLocation()
+				save_name = fileName[ fileName.rfind('/')+1:-4] + "_waypoints"
+
+				coords = self.prevfileswidget.getLocations( save_name )
+				if coords[0] == "error":
+					raise IOError( "File IO Error on save file. Save file likely missing." )
 				for i in range(0, len(coords)):
-					if coords[i][0] == temp_name:
-						self.viewer.add_waypoint(int(coords[i][1]), int(coords[i][2]), False)
+					self.viewer.add_waypoint( int(coords[i][0]), int(coords[i][1]), False )
 			if "error" in self.viewer.gps_points:
-				self.load_error_signal.emit( self.viewer.gps_points["error"] )
+				raise ValueError( self.viewer.gps_points["error"] )
 			else:
 				self.changeWidgetSignal.emit(1)
-		except ValueError as e:
+		except (OSError, IOError, FileNotFoundError, ValueError) as e:
 			self.loading_screen.hide()
-			self.load_error_signal.emit( "internal usng error encountered" )
-
+			msg = ''
+			if len(e.args) > 0:
+				msg = e.args[0]
+			else:
+				msg = repr(e)
+			self.load_error_signal.emit( msg )
 
 	# this slot is called when a signal is passed from the QtImageViewer class
 	@pyqtSlot(int, str, int, int)
@@ -247,29 +248,31 @@ class OverlayWidget(QWidget):
 	def buildEntry(self):
 
 		# full path of the loaded tif image
-		fullname = self.viewer.image_path
+		tifPath = self.viewer.image_path
 
 		# path of save files relative to src/overlay (cwd when this is running)
 		savepath = os.fspath("../../saves")
 
-	    # take the filename off of the full path to the loaded tif file
-		index = fullname.rfind( os.sep )
-		name = fullname[index:]
-		print(name)
-		name = name[:-4]
-		print("Saving waypoints to %s_waypoints.txt" % name)
+		# create saves folder if it doesn't exist
+		if not os.path.exists(savepath):
+			os.makedirs(savepath)
 
-		entry = ""
-		newFile = os.fspath( "../../saves"+ name + "_waypoints.txt" )
-		print(newFile)
+	    # take the filename off of the full path to the loaded tif file
+		index = tifPath.rfind( '/' )
+		name = tifPath[index:]
+		name = name[:-4]
+
+		newFileName = name + "_waypoints.txt"
+		newFilePath = os.fspath( "../../saves" + newFileName )
+		print("Saving waypoints to %s" % newFileName)
 
 		# open the savefile for writing and insert the tif's path followed by
 		# the x,y scene coordinates of each active waypoint.
-		f = open( newFile, "w+")
-		f.write("%s\n" % fullname)
+		f = open( newFilePath, "w+")
+		f.write("%s\n" % tifPath)
 		for key,val in self.viewer.waypoints.items():
-			xdata = val.x()
-			ydata = val.y()
+			xdata = int( round(val.x()) )
+			ydata = int( round(val.y()) )
 			newEntry = str(xdata) + "," + str(ydata)
 			f.write("%s\n" % newEntry)
 		f.close()
