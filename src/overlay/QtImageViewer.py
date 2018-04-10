@@ -116,19 +116,29 @@ class QtImageViewer(QGraphicsView):
     ###################################
 
     # 'set_image' is called by 'OverlayWidget' to add the .tif image to the image viewer
-    def set_image(self, str):
-        self.image_path = str
+    def set_image(self, str_):
+        self.image_path = str_
         try:
-            self.pixmap = QPixmap(self.image_path)
+            self.pixmap = QPixmap( os.fspath(self.image_path) )
         except (OSError, IOError, FileNotFoundError) as e:
             raise IOError("Unable to load tif image. File not found or insufficient permissions to read.")
         self.scene = QGraphicsScene()
         self.scene.addPixmap(self.pixmap)
         self.setScene(self.scene)
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
-        self.gps_points = get_points(self.image_path)
+        self.gps_points = get_points( os.fspath(self.image_path) )
         if not ("error" in self.gps_points):
             self.create_grid()
+
+        # this reader has error member functions unlike QPixMap so we can at least
+        # get a vague error out...
+        if self.pixmap.isNull():
+            print( "self.pixmap is null after attempted load, trying QImageReader" )
+            self.testing = QImageReader( os.fspath(self.image_path) )
+            print( "can QImageReader read the tif?", self.testing.canRead() )
+            self.testing.read()
+            print( "QImageReader .error():", self.testing.error() )
+            print( ".errorString():", self.testing.errorString() )
 
 
     def download_png_press(self):
