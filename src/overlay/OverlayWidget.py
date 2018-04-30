@@ -94,6 +94,7 @@ class OverlayWidget(QWidget):
 
 			# this label is left empty until set with a waypoint's coordinates when it is placed
 			self.waypts_widget_usng = QLabel()
+			self.waypts_widget_usng.setFont( QFont( "Arial", 15, QFont.Bold) )
 
 			# 'waypoint_delete_btn' will display the waypoint's delete button
 			self.waypoint_delete_btn = QPushButton('X')
@@ -209,6 +210,21 @@ class OverlayWidget(QWidget):
 		self.loading_screen.show()
 
 		try:
+			# If image_path exists, cleanup before loading
+			if hasattr(self.viewer, 'image_path'):
+				# Reset the waypoints list to initial state
+				for index in range( 0, len(self.waypoint_widgets) ):
+					if self.waypoint_widgets[index].isVisible():
+						key = ''
+						if index < 26:
+							key = chr( ord('A') + index )
+						else:
+							key = chr( ord('0') + (index - 26) )
+						print('key: ', key)
+						self.del_hide_waypoint(key)
+				# Close the open tif file (in case they want to open same file again for some reason)
+				QPixmapCache.clear()
+			
 			self.viewer.set_image(fileName)
 			self.viewer.gps_points = get_points(self.viewer.image_path)
 			self.loading_screen.hide()
