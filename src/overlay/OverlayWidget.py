@@ -211,7 +211,6 @@ class OverlayWidget(QWidget):
 
 		try:
 			# If image_path exists, cleanup before loading
-			# if self.viewer.hasattr('image_path'):
 			if hasattr(self.viewer, 'image_path'):
 				# Reset the waypoints list to initial state
 				for index in range( 0, len(self.waypoint_widgets) ):
@@ -225,7 +224,7 @@ class OverlayWidget(QWidget):
 						self.del_hide_waypoint(key)
 				# Close the open tif file (in case they want to open same file again for some reason)
 				QPixmapCache.clear()
-
+			
 			self.viewer.set_image(fileName)
 			self.viewer.gps_points = get_points(self.viewer.image_path)
 			self.loading_screen.hide()
