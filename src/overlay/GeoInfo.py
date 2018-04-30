@@ -88,7 +88,7 @@ def get_points( filename ):
 		# however there is no chance the drone has that level of accuracy, but it's unclear how to
 		# set the precision gdal uses to compute pixelScale, so either we must deal with the imprecision
 		# or get gdal to compute pixelscale using GPS coords to 5 decimal places only.
-		if (-90 <= geotransform[3] <= 90) and (-180 <= geotransform[0] <= 180):
+		if (-80 < geotransform[3] < 84) and (-180 <= geotransform[0] < 180):
 			data["pxscale"] = ( geotransform[5], geotransform[1] )
 			data["tl"] = ( geotransform[3], geotransform[0] )
 			data["tr"] = ( geotransform[3], geotransform[0] + ( geotransform[1] * dataset.RasterXSize )  )
@@ -98,7 +98,7 @@ def get_points( filename ):
 			data["ydim"] = dataset.RasterYSize
 			return data
 		else:
-			return { "error" : "ModelTiePoint not in lat/lon coordinates"}
+			return { "error" : "ModelTiePoint not in lat/lon coordinates. Need Lat in [-80,84], Lon in [-180,180]"}
 	else:
 		return { "error" : "Unexpected EXIF tag setup" }
 
